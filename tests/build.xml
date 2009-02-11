@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TestBuild" default="build" basedir=".">
+	<path id="tasks.classpath">
+		<pathelement location="."/>
+
+		<fileset dir="..\lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
+	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
+
+    <target name="build">
+		<preprocess infile="test.js" outfile="test-out.js" defines="value1,value2" />
+		<yuicompress infile="test-out.js" outfile="test.min.js" />
+    </target>
+</project>
