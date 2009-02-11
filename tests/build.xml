@@ -11,8 +11,8 @@
 	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
 	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
 
-    <target name="build">
+	<target name="build">
 		<preprocess infile="test.js" outfile="test-out.js" defines="value1,value2" />
 		<yuicompress infile="test-out.js" outfile="test.min.js" />
-    </target>
+	</target>
 </project>
