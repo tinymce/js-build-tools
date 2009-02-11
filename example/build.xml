@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="TestBuild" default="build" basedir=".">
-	<path id="tasks.classpath">
+	<!-- Setup classpath for js-build-tools ant tasks -->
+	<path id="js-build-tasks.classpath">
 		<pathelement location="."/>
 
 		<fileset dir="..\lib">
@@ -8,11 +9,22 @@
 		</fileset>
 	</path>
 
-	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
-	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
+	<!-- Register new js-build-tools ant tasks -->
+	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
+	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 
+	<!-- Setup default build target -->
 	<target name="build">
-		<preprocess infile="test.js" outfile="test-out.js" defines="value1,value2" />
-		<yuicompress infile="test-out.js" outfile="test.min.js" />
+		<!-- Concat multuple JS files together -->
+		<concat destfile="example.combined.js">
+			<fileset dir="." includes="example1.js" />
+			<fileset dir="." includes="example2.js" />
+		</concat>
+
+		<!-- Process pre proccesing instuctions like #if/#endif etc -->
+		<preprocess infile="example.combined.js" outfile="example.preprocessed.js" defines="value1,value2" />
+
+		<!-- Compress the file using the YUI Compressor -->
+		<yuicompress infile="example.preprocessed.js" outfile="example.min.js" />
 	</target>
 </project>
