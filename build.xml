@@ -16,7 +16,7 @@
 
     <target name="javadoc" depends="" description="Generates HTML documentation out of java source">
 		<mkdir dir="${project.build.dir}/docs/api"/>
-		<javadoc packagelist="packages.txt"
+		<javadoc
 			sourcepath="${project.src.dir}"
 			destdir="${project.build.dir}/docs/api"
 			author="true"
@@ -47,5 +47,24 @@
 		<!-- Build jar, and copy to lib -->
 		<jar jarfile="${project.build.dir}/${project.jar.prefix}.jar" basedir="${project.build.dir}/classes" compress="true" index="true" />
 		<copy file="${project.build.dir}/${project.jar.prefix}.jar" tofile="lib/${project.jar.prefix}.jar" overwrite="true"/>
+    </target>
+
+    <target name="release" depends="" description="Builds a release package">
+		<tar longfile="gnu" destfile="${project.build.dir}/js-build-tools.tar">
+			<tarfileset dir="example" prefix="example/">
+				<include name="**" />
+			</tarfileset>
+
+			<tarfileset dir="lib" prefix="lib/">
+				<include name="**" />
+				<exclude name="ant.jar" />
+			</tarfileset>
+
+			<tarfileset dir=".">
+				<include name="*.txt" />
+			</tarfileset>
+		</tar> 
+
+		<gzip zipfile="${project.build.dir}/js-build-tools.tgz" src="${project.build.dir}/js-build-tools.tar" />
     </target>
 </project>
