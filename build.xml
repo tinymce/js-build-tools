@@ -5,7 +5,7 @@
 	<property file="${user.home}/build.properties" />
 
 	<!-- Build classpath -->
-	<path id="classpath">
+	<path id="tasks.classpath">
 		<fileset dir="lib">
 			<include name="**/*.jar" /> 
 			<exclude name="**/*${project.jar.prefix}.jar*"/>
@@ -13,6 +13,8 @@
 
 		<pathelement location="${project.build.dir}/classes" /> 
 	</path>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="tasks.classpath" loaderref="tasks.classpath.loader" />
 
     <target name="javadoc" depends="" description="Generates HTML documentation out of java source">
 		<mkdir dir="${project.build.dir}/docs/api"/>
@@ -50,21 +52,23 @@
     </target>
 
     <target name="release" depends="" description="Builds a release package">
-		<tar longfile="gnu" destfile="${project.build.dir}/js-build-tools.tar">
-			<tarfileset dir="example" prefix="example/">
-				<include name="**" />
-			</tarfileset>
+		<loadfile property="changelog" srcFile="changelog.txt" />
+		<propertyregex property="version" input="${changelog}" regexp="^Version ([0-9xabrc.]+)" select="\1" />
+		<propertyregex property="release_date" input="${changelog}" regexp="^Version [^\(]+\(([^\)]+)\)" select="\1" />
+		<propertyregex property="file_version" input="${version}" regexp="\." replace="_" />
 
-			<tarfileset dir="lib" prefix="lib/">
-				<include name="**" />
-				<exclude name="ant.jar" />
-			</tarfileset>
-
-			<tarfileset dir=".">
-				<include name="*.txt" />
-			</tarfileset>
-		</tar> 
-
-		<gzip zipfile="${project.build.dir}/js-build-tools.tgz" src="${project.build.dir}/js-build-tools.tar" />
+		<!-- Compress development package -->
+		<mkdir dir="${project.build.dir}" />
+		<delete file="${project.build.dir}/js_build_tools_${file_version}.zip" quiet="true" />
+		<zip destfile="${project.build.dir}/js_build_tools_${file_version}.zip">
+			<zipfileset dir="." prefix="js-build-tools">
+				<include name="example/*" />
+				<include name="lib/js_build_tools.jar" />
+				<include name="lib/yuicompressor.jar" />
+				<include name="changelog.txt" />
+				<include name="readme.txt" />
+			</zipfileset>
+		</zip>
     </target>
 </project>
+
