@@ -21,7 +21,7 @@ public class YuiCompressTask extends Task {
 	protected String charset = "ISO-8859-1", inFile, outFile;
 	protected int lineBreakPosition = -1;
 	protected boolean munge = true;
-	protected boolean warn = true;
+	protected boolean warn = false;
 	protected boolean preserveAllSemiColons = false;
 	protected boolean optimize = true;
 

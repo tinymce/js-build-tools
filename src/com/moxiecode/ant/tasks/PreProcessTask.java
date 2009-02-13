@@ -18,9 +18,9 @@ import org.apache.tools.ant.BuildException;
 
 public class PreProcessTask extends Task {
 	protected String inFile, outFile;
-	protected String defines[];
+	protected String defines[] = new String[] {""};
 
-	public void PreProcess(InputStream in_stream, OutputStream out_stream, String defines[]) throws IOException {
+	public void preProcess(InputStream in_stream, OutputStream out_stream, String defines[]) throws IOException {
 		BufferedReader in = null;
 		BufferedWriter out = null;
 		String line;
@@ -108,10 +108,10 @@ public class PreProcessTask extends Task {
 
 	public void execute() throws BuildException {
 		try {
-			if (this.inFile == null || this.outFile == null || this.defines == null)
-				throw new BuildException("Missing required: infile, outfile or defines parameters.");
+			if (this.inFile == null || this.outFile == null)
+				throw new BuildException("Missing required: infile or outfile parameters.");
 
-			this.PreProcess(new FileInputStream(this.inFile), new FileOutputStream(this.outFile), this.defines);
+			this.preProcess(new FileInputStream(this.inFile), new FileOutputStream(this.outFile), this.defines);
 		} catch (IOException ex) {
 			throw new BuildException("I/O Error when preprocessing file", ex);
 		}
