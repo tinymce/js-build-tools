@@ -43,7 +43,7 @@
 
 		<!-- Compile the java code from ${src} into ${build} -->
 		<javac nowarn="true" srcdir="${project.src.dir}" destdir="${project.build.dir}/classes">
-			<classpath refid="classpath" />
+			<classpath refid="tasks.classpath" />
 		</javac>
 
 		<!-- Build jar, and copy to lib -->
