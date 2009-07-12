@@ -1,0 +1,83 @@
+body, td, th {
+	font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
+	font-size: 13px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Trebuchet MS","Bitstream Vera Sans",verdana,lucida,arial,helvetica,sans-serif;
+	font-weight: bold;
+	letter-spacing: 1px;
+	margin-bottom: 3px;
+	margin-top: 3px;
+	width: 90%;
+}
+
+ul, ul li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+h3 {
+	font-size: 13px;
+}
+
+table.summary {
+	border: 1px solid #999999;
+	margin-bottom: 20px;
+	margin-right: 10px;
+	margin-top: 10px;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table.summary th {
+	font-weight: bold;
+	text-align: left;
+	vertical-align: bottom;
+	background-color: #627C9D;
+	color: #FFFFFF;
+	white-space: nowrap;
+}
+
+table.summary td {
+	border: 1px solid #999999;
+}
+
+table.summary tr.even {
+	background: #f2f2f2;
+}
+
+table.summary tr.odd {
+	background: red;
+}
+
+table.summary td.first div {
+	margin-left: 30px;
+}
+
+.classSummary {
+}
+
+.inherited td.first {
+	background: url(../img/inherited.gif) no-repeat 10px 5px;
+}
+
+.toggleinherit .hide {
+	display: none;
+}
+
+.inheritageList a {
+	padding-right: 20px;
+	margin-right: 5px;
+	background: url(../img/inherit-arrow.gif) no-repeat center right;
+}
+
+.inheritageList a.last {
+	background: transparent;
+}
+
+.classDetails .first {
+	font-weight: bold;
+	padding-right: 20px;
+}

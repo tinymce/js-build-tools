@@ -1,6 +1,5 @@
 package com.moxiecode.ant.tasks;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileInputStream;
