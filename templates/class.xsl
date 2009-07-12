@@ -23,23 +23,41 @@
 					<td class="last"><xsl:value-of select="//class[@fullname=$target]/@name" /></td>
 				</tr>
 
-				<tr>
-					<td class="first">Inheritance</td>
-					<td class="last inheritageList">
-						<xsl:for-each select="//class[@fullname=$target]/super-classes/class-ref">
-							<a>
-								<xsl:if test="position() = last()">
-									<xsl:attribute name="class">last</xsl:attribute>
-								</xsl:if>
+				<xsl:if test="//class[@fullname=$target]/super-classes/class-ref">
+					<tr>
+						<td class="first">Inheritance</td>
+						<td class="last inheritageList">
+							<xsl:for-each select="//class[@fullname=$target]/super-classes/class-ref">
+								<a>
+									<xsl:if test="position() = last()">
+										<xsl:attribute name="class">last</xsl:attribute>
+									</xsl:if>
 
-								<xsl:attribute name="href">class_<xsl:value-of select="@class" />.html</xsl:attribute>
+									<xsl:attribute name="href">class_<xsl:value-of select="@class" />.html</xsl:attribute>
 
-								<xsl:variable name="class" select="@class" />
-								<xsl:value-of select="//class[@fullname=$class]/@name" />
-							</a>
-						</xsl:for-each>
-					</td>
-				</tr>
+									<xsl:variable name="class" select="@class" />
+									<xsl:value-of select="//class[@fullname=$class]/@name" />
+								</a>
+							</xsl:for-each>
+						</td>
+					</tr>
+				</xsl:if>
+
+				<xsl:if test="//class[@extends=$target]">
+					<tr>
+						<td class="first">Subclasses</td>
+						<td class="last subClassList">
+							<xsl:for-each select="//class[@extends=$target]">
+								<a>
+									<xsl:attribute name="href">class_<xsl:value-of select="@fullname" />.html</xsl:attribute>
+									<xsl:value-of select="@name" />
+								</a>
+
+								<xsl:if test="position() != last()">, </xsl:if>
+							</xsl:for-each>
+						</td>
+					</tr>
+				</xsl:if>
 			</table>
 
 			<div class="classSummary">
@@ -48,16 +66,162 @@
 
 			<xsl:if test="//class[@fullname=$target]/members/property">
 				<h2>Public Properties</h2>
-				<ul>
-					<xsl:for-each select="//class[@fullname=$target]/members/property">
-						<li>
-							<a>
-								<xsl:attribute name="href">#<xsl:value-of select="@name" /></xsl:attribute>
-								<xsl:value-of select="@name" />
-							</a>
-						</li>
-					</xsl:for-each>
-				</ul>
+
+				<a class="toggleinherit" href="#">
+					<span class="show">Show Inherited Public Properties</span>
+					<span class="hide">Hide Inherited Public Properties</span>
+				</a>
+
+				<table class="properties summary">
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Defined By</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xsl:for-each select="//class[@fullname=$target]/members/property">
+							<xsl:sort select="@name" />
+
+							<xsl:choose>
+								<xsl:when test="@inherited-from">
+									<xsl:variable name="inheritedfrom" select="@inherited-from" />
+									<xsl:variable name="name" select="@name" />
+
+									<tr class="inherited">
+										<xsl:if test="position() mod 2 = 0">
+											<xsl:attribute name="class">inherited even</xsl:attribute>
+										</xsl:if>
+
+										<td class="first">
+											<div>
+												<a>
+													<xsl:attribute name="href">class_<xsl:value-of select="$inheritedfrom" />.html#<xsl:value-of select="@name" /></xsl:attribute>
+													<xsl:value-of select="@name" />
+												</a>
+											</div>
+
+											<div class="shortSummary">
+												<xsl:value-of select="substring-before(//class[@fullname=$inheritedfrom]/members/property[@name=$name]/summary/text(), '.')" />.
+											</div>
+										</td>
+
+										<td>
+											<a>
+												<xsl:attribute name="href">class_<xsl:value-of select="$inheritedfrom" />.html#<xsl:value-of select="@name" /></xsl:attribute>
+												<xsl:value-of select="//class[@fullname=$inheritedfrom]/@name" />
+											</a>
+										</td>
+									</tr>
+								</xsl:when>
+
+								<xsl:otherwise>
+									<tr>
+										<xsl:if test="position() mod 2 = 0">
+											<xsl:attribute name="class">even</xsl:attribute>
+										</xsl:if>
+
+										<td class="first">
+											<div>
+												<a>
+													<xsl:attribute name="href">#<xsl:value-of select="@name" /></xsl:attribute>
+													<xsl:value-of select="@name" />
+												</a>
+											</div>
+
+
+											<div class="shortSummary">
+												<xsl:value-of select="substring-before(summary/text(), '.')" />.
+											</div>
+										</td>
+
+										<td><xsl:value-of select="//class[@fullname=$target]/@name" /></td>
+									</tr>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:for-each>
+					</tbody>
+				</table>
+			</xsl:if>
+
+			<xsl:if test="//class[@fullname=$target]/members/event">
+				<h2>Public Events</h2>
+
+				<a class="toggleinherit" href="#">
+					<span class="show">Show Inherited Public Events</span>
+					<span class="hide">Hide Inherited Public Events</span>
+				</a>
+
+				<table class="events summary">
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Defined By</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xsl:for-each select="//class[@fullname=$target]/members/event">
+							<xsl:sort select="@name" />
+
+							<xsl:choose>
+								<xsl:when test="@inherited-from">
+									<xsl:variable name="inheritedfrom" select="@inherited-from" />
+									<xsl:variable name="name" select="@name" />
+
+									<tr class="inherited">
+										<xsl:if test="position() mod 2 = 0">
+											<xsl:attribute name="class">inherited even</xsl:attribute>
+										</xsl:if>
+
+										<td class="first">
+											<div>
+												<a>
+													<xsl:attribute name="href">class_<xsl:value-of select="$inheritedfrom" />.html#<xsl:value-of select="@name" /></xsl:attribute>
+													<xsl:value-of select="@name" />
+												</a>
+											</div>
+
+											<div class="shortSummary">
+												<xsl:value-of select="substring-before(//class[@fullname=$inheritedfrom]/members/event[@name=$name]/summary/text(), '.')" />.
+											</div>
+										</td>
+
+										<td>
+											<a>
+												<xsl:attribute name="href">class_<xsl:value-of select="$inheritedfrom" />.html#<xsl:value-of select="@name" /></xsl:attribute>
+												<xsl:value-of select="//class[@fullname=$inheritedfrom]/@name" />
+											</a>
+										</td>
+									</tr>
+								</xsl:when>
+
+								<xsl:otherwise>
+									<tr>
+										<xsl:if test="position() mod 2 = 0">
+											<xsl:attribute name="class">even</xsl:attribute>
+										</xsl:if>
+
+										<td class="first">
+											<div>
+												<a>
+													<xsl:attribute name="href">#<xsl:value-of select="@name" /></xsl:attribute>
+													<xsl:value-of select="@name" />
+												</a>
+											</div>
+
+
+											<div class="shortSummary">
+												<xsl:value-of select="substring-before(summary/text(), '.')" />.
+											</div>
+										</td>
+
+										<td><xsl:value-of select="//class[@fullname=$target]/@name" /></td>
+									</tr>
+								</xsl:otherwise>
+							</xsl:choose>
+						</xsl:for-each>
+					</tbody>
+				</table>
 			</xsl:if>
 
 			<xsl:if test="//class[@fullname=$target]/members/method">

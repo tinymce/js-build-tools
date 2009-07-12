@@ -159,31 +159,33 @@ public class Processor {
 
 	// Private methods
 
-	public void copy(File src_path, File dst_path) throws IOException{
-		if (src_path.isDirectory()) {
-			if (!dst_path.exists())
-				dst_path.mkdir();
-
-			String files[] = src_path.list();
-
-			for (int i = 0; i < files.length; i++)
-				copy(new File(src_path, files[i]), new File(dst_path, files[i]));
-		} else {
-			if (!src_path.exists()) {
-				throw new IOException("File or directory does not exist.");
+	public void copy(File src_path, File dst_path) throws IOException {
+		if (!src_path.isHidden()) {
+			if (src_path.isDirectory()) {
+				if (!dst_path.exists())
+					dst_path.mkdir();
+	
+				String files[] = src_path.list();
+	
+				for (int i = 0; i < files.length; i++)
+					copy(new File(src_path, files[i]), new File(dst_path, files[i]));
 			} else {
-				InputStream in = new FileInputStream(src_path);
-				OutputStream out = new FileOutputStream(dst_path); 
-
-				byte[] buf = new byte[4096];
-				int len;
-
-				while ((len = in.read(buf)) > 0) {
-					out.write(buf, 0, len);
+				if (!src_path.exists()) {
+					throw new IOException("File or directory does not exist.");
+				} else {
+					InputStream in = new FileInputStream(src_path);
+					OutputStream out = new FileOutputStream(dst_path); 
+	
+					byte[] buf = new byte[4096];
+					int len;
+	
+					while ((len = in.read(buf)) > 0) {
+						out.write(buf, 0, len);
+					}
+	
+					in.close();
+					out.close();
 				}
-
-				in.close();
-				out.close();
 			}
 		}
 	}
