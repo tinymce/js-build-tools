@@ -51,6 +51,34 @@ public class CommentBlock {
 		return paramTagArray;
 	}
 
+	public Tag[] getExamples() {
+		Vector<Tag> exampleTags = new Vector<Tag>();
+
+		for (Tag tag : this.tags) {
+			if (tag.getName().equals("example"))
+				exampleTags.add((Tag) tag);
+		}
+
+		Tag examplesTagArray[] = new Tag[exampleTags.size()];
+		exampleTags.toArray(examplesTagArray);
+
+		return examplesTagArray;
+	}
+
+	public SeeTag[] getSeeTags() {
+		Vector<Tag> seeTags = new Vector<Tag>();
+
+		for (Tag tag : this.tags) {
+			if (tag.getName().equals("see"))
+				seeTags.add((SeeTag) tag);
+		}
+
+		SeeTag seeTagArray[] = new SeeTag[seeTags.size()];
+		seeTags.toArray(seeTagArray);
+
+		return seeTagArray;
+	}
+
 	public boolean hasTag(String tag_name) {
 		return this.getTag(tag_name) != null;
 	}
@@ -81,16 +109,16 @@ public class CommentBlock {
 		Vector<Tag> tags = new Vector<Tag>();
 
 		try {
-			Pattern tagPattern = Pattern.compile("^@([^\\s]+)\\s*(.+)?$", Pattern.CASE_INSENSITIVE);
+			Pattern tagPattern = Pattern.compile("^\\s*@([^\\s]+)\\s*(.+)?$", Pattern.CASE_INSENSITIVE);
 			Tag tag = null;
 
 			in = new BufferedReader(new StringReader(raw_text));
 
 			while ((line = in.readLine()) != null) {
 				// Remove * prefix/suffixes
-				line = line.replaceAll("^\\/?\\*+", "");
+				line = line.replaceAll("^\\/?\\*+\\s?", "");
 				line = line.replaceAll("\\**\\/$", "");
-				line = line.trim();
+				//line = line.trim();
 
 				Matcher tagMatcher = tagPattern.matcher(line);
 				if (tagMatcher.matches()) {
@@ -116,6 +144,8 @@ public class CommentBlock {
 						tag = new ParamTag(tagName, tagText, pos);
 					else if (tagName.equals("return"))
 						tag = new ReturnTag(tagName, tagText, pos);
+					else if (tagName.equals("see"))
+						tag = new SeeTag(tagName, tagText, pos);
 					else
 						tag = new Tag(tagName, tagText, pos);
 
@@ -123,12 +153,12 @@ public class CommentBlock {
 				} else {
 					if (tag == null) {
 						if (textBuffer.length() > 0)
-							textBuffer.append(' ');
+							textBuffer.append('\n');
 
 						textBuffer.append(line);
 					} else {
 						if (tag.getRawText().length() > 0)
-							tag.setRawText(tag.getRawText() + " ");
+							tag.setRawText(tag.getRawText() + "\n");
 
 						tag.setRawText(tag.getRawText() + line);
 					}

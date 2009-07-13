@@ -30,7 +30,6 @@ import com.moxiecode.moxiedoc.util.XPathHelper;
 public class Processor {
 	private int processedFileCount;
 	private Vector<File> files;
-	private String classXslt;
 	private File outDir;
 	private Document doc;
 	private File templateDir;
@@ -41,10 +40,6 @@ public class Processor {
 
 	public void addFile(File file) {
 		this.files.add(file);
-	}
-
-	public void setClassXslt(String template) {
-		this.classXslt = template;
 	}
 
 	public void setTemplateDir(File template_dir) {
@@ -102,14 +97,14 @@ public class Processor {
 							membersElm = (Element) classElm.appendChild(this.doc.createElement("members"));
 
 						for (Element memberElm : XPathHelper.findElements("members/*", superClassElm)) {
-							if (!memberElm.hasAttribute("inherited-from")) {
+							if (!memberElm.hasAttribute("inherited-from") && !memberElm.hasAttribute("constructor")) {
 								String memberName = memberElm.getAttribute("name");
 
 								// Check if item exists already
 								if (XPathHelper.findElement("members/*[@name='" + memberName + "']", classElm) == null) {
 									Element superMemberElm = XPathHelper.findElement("members/*[@name='" + memberName + "']", superClassElm);
 
-									if (!superMemberElm.hasAttribute("inherited-from") && !superMemberElm.getNodeName().equals("constructor")) {
+									if (!superMemberElm.hasAttribute("inherited-from")) {
 										Element memberRefElm = this.doc.createElement(superMemberElm.getNodeName());
 
 										memberRefElm.setAttribute("name", memberName);
@@ -140,6 +135,9 @@ public class Processor {
 			transform("classes.xsl", "namespace_" + name + ".html", name);
 		}
 
+		if (XPathHelper.findElement("/model/class", this.doc) != null)
+			transform("classes.xsl", "namespace_top_level.html", "top_level");
+
 		for (Element classElm : XPathHelper.findElements("//class", this.doc)) {
 			String className = classElm.getAttribute("fullname");
 
@@ -164,9 +162,9 @@ public class Processor {
 			if (src_path.isDirectory()) {
 				if (!dst_path.exists())
 					dst_path.mkdir();
-	
+
 				String files[] = src_path.list();
-	
+
 				for (int i = 0; i < files.length; i++)
 					copy(new File(src_path, files[i]), new File(dst_path, files[i]));
 			} else {
@@ -263,16 +261,28 @@ public class Processor {
 		}
 
 		// Add boolean properties
-		String boolProps[] = {"static", "final", "abstract", "private", "protected", "public"};
+		String boolProps[] = {"constructor", "static", "final", "abstract", "private", "protected", "public"};
 		for (String name : boolProps) {
 			if (block.hasTag(name))
 				elm.setAttribute(name, "true");
 		}
 
+		// Add description
+		Element descriptionElm = doc.createElement("description");
+		descriptionElm.appendChild(doc.createTextNode(block.getText()));
+		elm.appendChild(descriptionElm);
+
 		// Add summary
-		Element summaryElm = doc.createElement("summary");
-		summaryElm.appendChild(doc.createTextNode(block.getText()));
-		elm.appendChild(summaryElm);
+		String summary = block.getText().replaceAll("<[^>]+>", "");
+		int dotIdx = summary.indexOf('.');
+
+		if (dotIdx != -1)
+			summary = summary.substring(0, dotIdx + 1);
+
+		if (summary.length() > 120)
+			summary = summary.substring(0, 120) + "...";
+
+		elm.setAttribute("summary", summary);
 
 		// Add params
 		for (ParamTag paramTag : block.getParams()) {
@@ -282,10 +292,10 @@ public class Processor {
 			paramElm.setAttribute("name", paramTag.getParameterName());
 			paramElm.setAttribute("type", paramTag.getType());
 
-			// Add summary
-			Element paramSummaryElm = doc.createElement("summary");
-			paramSummaryElm.appendChild(doc.createTextNode(paramTag.getText()));
-			paramElm.appendChild(paramSummaryElm);
+			// Add description
+			Element paramDescriptionElm = doc.createElement("description");
+			paramDescriptionElm.appendChild(doc.createTextNode(paramTag.getText()));
+			paramElm.appendChild(paramDescriptionElm);
 
 			// Append
 			elm.appendChild(paramElm);
@@ -296,23 +306,54 @@ public class Processor {
 			ReturnTag returnTag = (ReturnTag) block.getTag("return");
 
 			Element returnElm = doc.createElement("return");
-			Element returnSummaryElm = doc.createElement("summary");
+			Element returnDescriptionElm = doc.createElement("description");
 
 			returnElm.setAttribute("type", returnTag.getType());
 
-			returnSummaryElm.appendChild(doc.createTextNode(returnTag.getText()));
-			returnElm.appendChild(returnSummaryElm);
+			returnDescriptionElm.appendChild(doc.createTextNode(returnTag.getText()));
+			returnElm.appendChild(returnDescriptionElm);
 
 			elm.appendChild(returnElm);
+		}
+
+		// Add examples
+		for (Tag exampleTag : block.getExamples()) {
+			Element exampleElm = doc.createElement("example");
+
+			// Add description
+			Element paramDescriptionElm = doc.createElement("example");
+			paramDescriptionElm.appendChild(doc.createTextNode(exampleTag.getText()));
+			exampleElm.appendChild(paramDescriptionElm);
+
+			// Append
+			elm.appendChild(exampleElm);
+		}
+
+		// Add see tags
+		for (SeeTag seeTag : block.getSeeTags()) {
+			Element seeElm = doc.createElement("see");
+
+			// Add class
+			if (seeTag.getClassName().length() > 0)
+				seeElm.setAttribute("class", seeTag.getClassName());
+
+			// Add method
+			if (seeTag.getMemberName().length() > 0)
+				seeElm.setAttribute("member", seeTag.getMemberName());
+
+			// Append
+			elm.appendChild(seeElm);
 		}
 	}
 
 	private void addToXml(CommentBlock[] blocks) throws XPathExpressionException {
 		Element classElm = null;
+		boolean isStaticClass = false;
 
 		for (CommentBlock block : blocks)  {
 			if (block.hasTag("class")) {
 				classElm = addClass(block);
+				isStaticClass = block.hasTag("static");
 			} else {
 				Element memberElm = null;
 				Element members;
@@ -326,18 +367,10 @@ public class Processor {
 					if (block.hasTag("method")) {
 						memberElm = doc.createElement("method");
 						memberElm.setAttribute("name", block.getTag("method").getText());
-					}
 
-					// Is constructor
-					if (block.hasTag("constructor")) {
-						memberElm = doc.createElement("constructor");
-
-						String text = block.getTag("constructor").getText();
-
-						if (text.length() == 0 && block.hasTag("method"))
-							text = block.getTag("method").getText();
-
-						memberElm.setAttribute("name", text);
+						// Whole class is static
+						if (isStaticClass)
+							memberElm.setAttribute("static", "true");
 					}
 
 					// Is event

@@ -12,6 +12,10 @@
 			<h3>Namespaces</h3>
 
 			<ul>
+				<xsl:if test="model/class">
+					<li><a href="namespace_top_level.html" target="classes">Top Level</a></li>
+				</xsl:if>
+
 				<xsl:for-each select="//namespace">
 					<xsl:if test="class">
 						<li>
