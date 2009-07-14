@@ -300,8 +300,9 @@
 
 	<xsl:template name="member_details">
 		<div class="memberDetails">
+			<xsl:attribute name="id"><xsl:value-of select="@name" /></xsl:attribute>
+
 			<h2>
-				<xsl:attribute name="id"><xsl:value-of select="@name" /></xsl:attribute>
 				<xsl:value-of select="@name" />
 
 				<span class="memberType">

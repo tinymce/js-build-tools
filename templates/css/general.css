@@ -161,3 +161,7 @@ pre {
 	font-size: 13px;
 	font-weight: normal;
 }
+
+.selected {
+	font-weight: bold;
+}

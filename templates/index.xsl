@@ -29,7 +29,7 @@
 			<xsl:when test="@alias-for">
 				<li>
 					<span class="alias">
-						<a>
+						<a class="aliasLink">
 							<xsl:attribute name="href">class_<xsl:value-of select="@alias-for" />.html</xsl:attribute>
 							<xsl:text><xsl:value-of select="@name" /></xsl:text>
 						</a>

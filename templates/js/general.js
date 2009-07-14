@@ -1,6 +1,28 @@
 (function($){
 	var history = [], pos = 0, currentPage;
 
+	function getPos(n, ro) {
+		var x = 0, y = 0, e, r;
+
+		if (n) {
+			r = n;
+			while (r && r != ro && r.nodeType) {
+				x += r.offsetLeft || 0;
+				y += r.offsetTop || 0;
+				r = r.offsetParent;
+			}
+
+			r = n.parentNode;
+			while (r && r != ro && r.nodeType) {
+				x -= r.scrollLeft || 0;
+				y -= r.scrollTop || 0;
+				r = r.parentNode;
+			}
+		}
+
+		return {x : x, y : y};
+	}
+
 	function resizeUI() {
 		$('#doc3').css('height', (window.innerHeight || document.documentElement.clientHeight) - $('#hd').height() - 12);
 	}
@@ -8,9 +30,7 @@
 	function scrollToHash(hash) {
 		if (hash) {
 			$(hash).each(function() {
-				var offset = $(this).offset();
-
-				$('#detailsView')[0].scrollTop = offset.top - $('#detailsView').offset().top;
+				$('#detailsView')[0].scrollTop = getPos(this, $('#detailsView')[0].firstChild).y - 40;
 			});
 		}
 	}
@@ -25,6 +45,9 @@
 		}
 
 		currentPage = parts[1];
+
+		$("#classView a.selected").removeClass('selected');
+		$("#classView a[href='" + currentPage.replace(/^.*\/([^\/]+)$/, '$1') + "']:not(.aliasLink)").addClass('selected');
 
 		$.get(parts[1], "", function(data) {
 			data = /<body[^>]*>([\s\S]+)<\/body>/.exec(data);

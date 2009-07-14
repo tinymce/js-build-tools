@@ -125,18 +125,6 @@ public class Processor {
 
 		// Generate HTML using XSLT
 		transform("index.xsl", "index.html", "index");
-		transform("namespaces.xsl", "namespaces.html", "namespaces");
-		transform("all_classes.xsl", "classes.html", "classes");
-		transform("overview.xsl", "overview.html", "overview");
-
-		for (Element namespaceElm : XPathHelper.findElements("//namespace", this.doc)) {
-			String name = namespaceElm.getAttribute("fullname");
-
-			transform("classes.xsl", "namespace_" + name + ".html", name);
-		}
-
-		if (XPathHelper.findElement("/model/class", this.doc) != null)
-			transform("classes.xsl", "namespace_top_level.html", "top_level");
 
 		for (Element classElm : XPathHelper.findElements("//class", this.doc)) {
 			String className = classElm.getAttribute("fullname");
@@ -211,12 +199,11 @@ public class Processor {
 		}
 	}
 
-	private Element addClass(CommentBlock block) throws XPathExpressionException {
+	private Element makeNameSpace(String class_name) throws XPathExpressionException {
 		Element targetElm = this.doc.getDocumentElement();
-		String className = block.getTag("class").getText();
-		String parts[] = className.split("\\.");
+		String parts[] = class_name.split("\\.");
 		String namespace = "";
-
+	
 		// Create namespaces if needed
 		for (int i = 0; i < parts.length - 1; i++) {
 			if (i > 0)
@@ -237,16 +224,40 @@ public class Processor {
 				targetElm = nsElm;
 		}
 
+		return targetElm;
+	}
+
+	private String getShortName(String str) {
+		return str.replaceAll("^.*\\.", "");
+	}
+
+	private Element addClass(CommentBlock block) throws XPathExpressionException {
+		String className = block.getTag("class").getText();
+		Element targetElm = makeNameSpace(className);
+
 		// Add class to namespace
 		Element classElm = this.doc.createElement("class");
 
-		classElm.setAttribute("name", parts[parts.length - 1]);
+		classElm.setAttribute("name", getShortName(className));
 		classElm.setAttribute("fullname", className);
 
 		targetElm.appendChild(classElm);
 
 		addTags(block, classElm);
 
+		// Add alias class
+		for(Tag aliasTag : block.getTags("alias")) {
+			Element aliasClassElm = this.doc.createElement("class");
+			String aliasClassName = aliasTag.getText();
+			Element aliasNameSpaceElm = makeNameSpace(aliasClassName);
+
+			aliasClassElm.setAttribute("alias-for", className);
+			aliasClassElm.setAttribute("name", getShortName(aliasClassName));
+			aliasClassElm.setAttribute("fullname", aliasClassName);
+
+			aliasNameSpaceElm.appendChild(aliasClassElm);
+		}
+		
 		return classElm;
 	}
 

@@ -28,6 +28,20 @@ public class CommentBlock {
 		return this.tags;
 	}
 
+	public Tag[] getTags(String tag_name) {
+		Vector<Tag> tags = new Vector<Tag>();
+
+		for (Tag tag : this.tags) {
+			if (tag.getName().equals(tag_name))
+				tags.add((Tag) tag);
+		}
+
+		Tag tagArray[] = new Tag[tags.size()];
+		tags.toArray(tagArray);
+
+		return tagArray;
+	}
+
 	public Tag getTag(String tag_name) {
 		for (Tag tag : this.tags) {
 			if (tag.getName().equals(tag_name))
