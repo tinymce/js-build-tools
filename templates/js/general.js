@@ -1,5 +1,5 @@
 (function($){
-	var history = [], pos = 0, currentPage;
+	var currentPage, currentHash;
 
 	function getPos(n, ro) {
 		var x = 0, y = 0, e, r;
@@ -40,7 +40,11 @@
 
 		// In page link, no need to load anything
 		if (parts[1] == currentPage) {
-			scrollToHash(hash);
+			if (hash)
+				scrollToHash(hash);
+			else
+				 $('#detailsView')[0].scrollTop = 0;
+
 			return;
 		}
 
@@ -63,18 +67,23 @@
 		$("#browser").treeview();
 		$(window).resize(resizeUI).trigger('resize');
 
-	/*	window.setInterval(function() {
-			var hash = parseInt(document.location.hash.replace(/^#/, ''));
+		window.setInterval(function() {
+			var hash = document.location.hash;
 
-			loadURL(history[hash - 1]);
-			history.length = hash;
-		}, 100); */
+			if (hash != currentHash && hash) {
+				loadURL(hash.replace(/\-/g, '#').substring(1));
+				currentHash = hash;
+			}
+		}, 100);
 
 		$("a").live("click", function(e) {
 			var url = e.target.href;
 
-			if (url.indexOf('class_') != -1)
+			if (url.indexOf('class_') != -1) {
+				document.location.hash = e.target.href.replace(/^.*\/([^\/]+)/, '$1').replace(/#/g, '-');
+
 				loadURL(url);
+			}
 
 			e.preventDefault();
 		});

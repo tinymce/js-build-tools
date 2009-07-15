@@ -398,7 +398,7 @@
 			<!-- Output return -->
 			<xsl:if test="return">
 				<h3>Returns</h3>
-				<div class="return">
+				<div class="returns">
 					<xsl:call-template name="type_name">
 						<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
 					</xsl:call-template>
