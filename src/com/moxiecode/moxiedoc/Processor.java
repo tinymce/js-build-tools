@@ -390,6 +390,12 @@ public class Processor {
 						memberElm.setAttribute("name", block.getTag("event").getText());
 					}
 
+					// Is option
+					if (block.hasTag("option")) {
+						memberElm = doc.createElement("option");
+						memberElm.setAttribute("name", block.getTag("option").getText());
+					}
+
 					// Is property
 					if (block.hasTag("property")) {
 						memberElm = doc.createElement("property");

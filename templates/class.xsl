@@ -27,6 +27,13 @@
 				</div>
 
 				<div class="summaryLists">
+					<!-- Option summary -->
+					<xsl:call-template name="member_summary_list">
+						<xsl:with-param	name="type">option</xsl:with-param>
+						<xsl:with-param	name="singular">Option</xsl:with-param>
+						<xsl:with-param	name="plural">Options</xsl:with-param>
+					</xsl:call-template>
+
 					<!-- Property summary -->
 					<xsl:call-template name="member_summary_list">
 						<xsl:with-param	name="type">property</xsl:with-param>
@@ -49,7 +56,14 @@
 					</xsl:call-template>
 				</div>
 
-				<div class="details">
+				<div class="detailsList">
+					<!-- Option details -->
+					<xsl:call-template name="member_details_list">
+						<xsl:with-param	name="type">option</xsl:with-param>
+						<xsl:with-param	name="singular">Option</xsl:with-param>
+						<xsl:with-param	name="plural">Options</xsl:with-param>
+					</xsl:call-template>
+
 					<!-- Property details -->
 					<xsl:call-template name="member_details_list">
 						<xsl:with-param	name="type">property</xsl:with-param>
@@ -229,37 +243,29 @@
 		<xsl:param name="plural" />
 
 		<xsl:if test="//class[@fullname=$target]/members/*[name()=$type]">
-			<h1><xsl:value-of select="$singular" /> details</h1>
+			<div class="details">
+				<h2><xsl:value-of select="$singular" /> details</h2>
 
-			<xsl:for-each select="//class[@fullname=$target]/members/*[name()=$type][not(@inherited-from)]">
-				<xsl:sort select="@constructor" order="descending" />
-				<xsl:sort select="@name" />
+				<xsl:for-each select="//class[@fullname=$target]/members/*[name()=$type][not(@inherited-from)]">
+					<xsl:sort select="@constructor" order="descending" />
+					<xsl:sort select="@name" />
 
-				<xsl:call-template name="member_details" />
-			</xsl:for-each>
+					<xsl:call-template name="member_details" />
+				</xsl:for-each>
+			</div>
 		</xsl:if>
 	</xsl:template>
 
 	<xsl:template name="member_summary">
 		<div>
-			<a>
+			<a class="memberName">
 				<xsl:attribute name="href">class_<xsl:value-of select="parent::members/parent::class/@fullname" />.html#<xsl:value-of select="@name" /></xsl:attribute>
 				<xsl:value-of select="@name" />
 			</a>
 
 			<xsl:choose>
 				<xsl:when test="name() = 'method'">
-					<xsl:text>(</xsl:text>
-					<xsl:for-each select="param">
-						<xsl:value-of select="@name" />
-						<xsl:text>:</xsl:text>
-						<xsl:call-template name="type_name">
-							<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
-						</xsl:call-template>
-
-						<xsl:if test="position() != last()">, </xsl:if>
-					</xsl:for-each>
-					<xsl:text>)</xsl:text>
+					<xsl:call-template name="params" />
 
 					<!-- Output return type -->
 					<xsl:if test="not(@constructor)">
@@ -276,7 +282,11 @@
 					</xsl:if>
 				</xsl:when>
 
-				<xsl:when test="name() = 'property'">
+				<xsl:when test="name() = 'event'">
+					<xsl:call-template name="params" />
+				</xsl:when>
+
+				<xsl:otherwise>
 					<!-- Output type -->
 					<xsl:text> : </xsl:text>
 					<xsl:choose>
@@ -288,7 +298,7 @@
 
 						<xsl:otherwise>Object</xsl:otherwise>
 					</xsl:choose>
-				</xsl:when>
+				</xsl:otherwise>
 			</xsl:choose>
 		</div>
 
@@ -300,9 +310,13 @@
 
 	<xsl:template name="member_details">
 		<div class="memberDetails">
+			<xsl:if test="position() = last()">
+				<xsl:attribute name="class">memberDetails last</xsl:attribute>
+			</xsl:if>
+
 			<xsl:attribute name="id"><xsl:value-of select="@name" /></xsl:attribute>
 
-			<h2>
+			<h3>
 				<xsl:value-of select="@name" />
 
 				<span class="memberType">
@@ -311,9 +325,9 @@
 						<xsl:otherwise><xsl:value-of select="name()" /></xsl:otherwise>
 					</xsl:choose>
 				</span>
-			</h2>
+			</h3>
 
-			<code>
+			<code class="syntax">
 				<xsl:choose>
 					<xsl:when test="@protected">protected </xsl:when>
 					<xsl:when test="@private">private </xsl:when>
@@ -323,36 +337,6 @@
 				<xsl:if test="@static">static </xsl:if>
 
 				<xsl:choose>
-					<xsl:when test="name() = 'method'">
-						function <xsl:value-of select="@name" />
-
-						<xsl:text>(</xsl:text>
-						<xsl:for-each select="param">
-							<xsl:value-of select="@name" />
-							<xsl:text>:</xsl:text>
-							<xsl:call-template name="type_name">
-								<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
-							</xsl:call-template>
-
-							<xsl:if test="position() != last()">, </xsl:if>
-						</xsl:for-each>
-						<xsl:text>)</xsl:text>
-
-						<!-- Output return type -->
-						<xsl:if test="not(@constructor)">
-							<xsl:text>:</xsl:text>
-							<xsl:choose>
-								<xsl:when test="return">
-									<xsl:call-template name="type_name">
-										<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
-									</xsl:call-template>
-								</xsl:when>
-
-								<xsl:otherwise>void</xsl:otherwise>
-							</xsl:choose>
-						</xsl:if>
-					</xsl:when>
-
 					<xsl:when test="name() = 'property'">
 						<xsl:value-of select="@name" />
 
@@ -369,6 +353,35 @@
 						</xsl:choose>
 					</xsl:when>
 
+					<xsl:when test="name() = 'method'">
+						function <xsl:value-of select="@name" /><xsl:call-template name="params" />
+
+						<!-- Output return type -->
+						<xsl:if test="not(@constructor)">
+							<xsl:text>:</xsl:text>
+							<xsl:choose>
+								<xsl:when test="return">
+									<xsl:call-template name="type_name">
+										<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
+									</xsl:call-template>
+								</xsl:when>
+
+								<xsl:otherwise>void</xsl:otherwise>
+							</xsl:choose>
+						</xsl:if>
+					</xsl:when>
+
+					<xsl:when test="name() = 'option'">
+						option <xsl:value-of select="@name" /> : 
+						<xsl:call-template name="type_name">
+							<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
+						</xsl:call-template>
+					</xsl:when>
+
+					<xsl:when test="name() = 'event'">
+						event <xsl:value-of select="@name" /><xsl:call-template name="params" />
+					</xsl:when>
+
 					<xsl:otherwise><xsl:value-of select="@name" /></xsl:otherwise>
 				</xsl:choose>
 			</code>
@@ -377,7 +390,7 @@
 
 			<!-- Output parameters -->
 			<xsl:if test="param">
-				<h3>Parameters</h3>
+				<h4>Parameters</h4>
 
 				<table class="params">
 					<xsl:for-each select="param">
@@ -397,7 +410,7 @@
 
 			<!-- Output return -->
 			<xsl:if test="return">
-				<h3>Returns</h3>
+				<h4>Returns</h4>
 				<div class="returns">
 					<xsl:call-template name="type_name">
 						<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
@@ -454,6 +467,20 @@
 				</xsl:for-each>
 			</xsl:if>
 		</div>
+	</xsl:template>
+
+	<xsl:template name="params">
+		<xsl:text>(</xsl:text>
+		<xsl:for-each select="param">
+			<xsl:value-of select="@name" />
+			<xsl:text>:</xsl:text>
+			<xsl:call-template name="type_name">
+				<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
+			</xsl:call-template>
+
+			<xsl:if test="position() != last()">, </xsl:if>
+		</xsl:for-each>
+		<xsl:text>)</xsl:text>
 	</xsl:template>
 
 	<xsl:template name="type_name">

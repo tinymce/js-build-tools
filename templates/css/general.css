@@ -1,6 +1,6 @@
 body, html {
 	overflow: hidden;
-	background: #DFE8F6;
+	background-color: #DFE8F6;
 }
 
 #doc3 {
@@ -66,6 +66,10 @@ h2 {
 }
 
 h3 {
+	font-size: 16px;
+}
+
+h4 {
 	font-size: 13px;
 }
 
@@ -102,12 +106,24 @@ table.summary td {
 	padding: 4px;
 }
 
+table.summary a.memberName {
+	font-weight: bold;
+}
+
 table.summary tr.even {
 	background: #f2f2f2;
 }
 
 table.summary td.first div {
 	margin-left: 30px;
+}
+
+table.summary td.first {
+	width: 95%;
+}
+
+table.summary td.last {
+	width: 5%;
 }
 
 .params, .returns {
@@ -164,4 +180,32 @@ pre {
 
 .selected {
 	font-weight: bold;
+}
+
+.memberDetails {
+	border-bottom: 1px solid gray;
+	margin-bottom: 10px;
+}
+
+.details {
+	padding-bottom: 10px;
+}
+
+.details .last {
+	border: 0;
+}
+
+.details h2 {
+	width: 100%;
+	background-color: #627C9D;
+	color: #FFF;
+	padding: 4px;
+}
+
+.memberDetails {
+	padding-left: 15px;
+}
+
+code.syntax {
+	background-color: #F2F2F2;
 }
