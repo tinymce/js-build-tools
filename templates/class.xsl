@@ -13,14 +13,29 @@
 	<xsl:template match="/">
 		<html>
 		<head>
-			<title>Class</title>
-			<link href="css/general.css" rel="stylesheet" type="text/css" />
+			<title>Class: <xsl:value-of select="//class[@fullname=$target]/@fullname" /></title>
+			<meta name="generator" content="MoxieDoc" />
+
+			<link rel="stylesheet" type="text/css" href="css/reset.css" />
+			<link rel="stylesheet" type="text/css" href="css/grids.css" />
+			<link rel="stylesheet" type="text/css" href="css/general.css" />
+
+			<script type="text/javascript">
+				// Load through index instead
+				document.location = 'index.html#' + document.location.pathname.replace(/^.+\/([^\/]+)$/, '$1');
+			</script>
 		</head>
 		<body>
 			<div class="classDetailsContent">
 				<h1><xsl:value-of select="//class[@fullname=$target]/@fullname" /></h1>
 
 				<xsl:call-template name="class_details" />
+
+				<xsl:if test="//class[@fullname=$target]/@deprecated">
+					<div class="deprecated">
+						Deprecated: <xsl:value-of select="//class[@fullname=$target]/@deprecated" />
+					</div>
+				</xsl:if>
 
 				<div class="classDescription">
 					<xsl:value-of select="//class[@fullname=$target]/description/text()" />
@@ -302,10 +317,20 @@
 			</xsl:choose>
 		</div>
 
-		<div class="summary">
-			<xsl:if test="@static">[static] </xsl:if>
-			<xsl:text><xsl:value-of select="@summary" /></xsl:text>
-		</div>
+		<xsl:choose>
+			<xsl:when test="@deprecated">
+				<div class="deprecated">
+					Deprecated: <xsl:value-of select="@deprecated" />
+				</div>
+			</xsl:when>
+
+			<xsl:otherwise>
+				<div class="summary">
+					<xsl:if test="@static"><span class="static">[static] </span></xsl:if>
+					<xsl:text><xsl:value-of select="@summary" /></xsl:text>
+				</div>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="member_details">
@@ -386,6 +411,12 @@
 				</xsl:choose>
 			</code>
 
+			<xsl:if test="@deprecated">
+				<div class="deprecated">
+					Deprecated: <xsl:value-of select="@deprecated" />
+				</div>
+			</xsl:if>
+
 			<div class="memberDescription"><xsl:value-of select="description/text()" disable-output-escaping="yes" /></div>
 
 			<!-- Output parameters -->
@@ -422,9 +453,9 @@
 
 			<!-- Output see also -->
 			<xsl:if test="see">
-				<h3>See Also</h3>
+				<h4>See Also</h4>
 
-				<ul>
+				<ul class="see">
 					<xsl:for-each select="see">
 						<xsl:variable name="class" select="@class" />
 						<xsl:variable name="member" select="@member" />
@@ -432,7 +463,11 @@
 						<li>
 							<a>
 								<xsl:attribute name="href">
-									<xsl:if test="@class">class_<xsl:value-of select="@class" />.html</xsl:if>
+									<xsl:choose>
+										<xsl:when test="@class">class_<xsl:value-of select="@class" />.html</xsl:when>
+										<xsl:otherwise>class_<xsl:value-of select="$target" />.html</xsl:otherwise>
+									</xsl:choose>
+
 									<xsl:if test="@member">#<xsl:value-of select="@member" /></xsl:if>
 								</xsl:attribute>
 

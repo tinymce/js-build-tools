@@ -265,7 +265,7 @@ public class Processor {
 		Document doc = elm.getOwnerDocument();
 
 		// Add value properties
-		String valueProps[] = {"name", "extends", "type"};
+		String valueProps[] = {"name", "extends", "type", "deprecated"};
 		for (String name : valueProps) {
 			if (block.hasTag(name))
 				elm.setAttribute(name, block.getTag(name).getText());
@@ -378,10 +378,6 @@ public class Processor {
 					if (block.hasTag("method")) {
 						memberElm = doc.createElement("method");
 						memberElm.setAttribute("name", block.getTag("method").getText());
-
-						// Whole class is static
-						if (isStaticClass)
-							memberElm.setAttribute("static", "true");
 					}
 
 					// Is event
@@ -403,6 +399,10 @@ public class Processor {
 					}
 
 					if (memberElm != null) {
+						// Whole class is static
+						if (isStaticClass)
+							memberElm.setAttribute("static", "true");
+
 						addTags(block, memberElm);
 						members.appendChild(memberElm);
 					}

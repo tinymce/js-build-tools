@@ -126,7 +126,11 @@ table.summary td.last {
 	width: 5%;
 }
 
-.params, .returns {
+table.summary .deprecated {
+	margin: 0;
+}
+
+.params, .returns, .see {
 	margin-left: 20px;
 	margin-bottom: 10px;
 }
@@ -135,7 +139,7 @@ table.summary td.last {
 	padding-left: 10px;
 }
 
-.classDescription, .memberDescription {
+.classDescription, .memberDescription, .deprecated {
 	margin: 10px 0 10px 0;
 }
 
@@ -208,4 +212,12 @@ pre {
 
 code.syntax {
 	background-color: #F2F2F2;
+}
+
+.deprecated {
+	font-weight: bold;
+}
+
+.static {
+	color: gray;
 }
