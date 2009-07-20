@@ -28,7 +28,7 @@
 		<body>
 			<div class="details memberDetailsContent">
 				<xsl:for-each select="/method[@fullname=$target]|//property[@fullname=$target]|//event[@fullname=$target]">
-					<h1>Member: <xsl:value-of select="@fullname" /></h1>
+					<h1><xsl:value-of select="@fullname" /></h1>
 
 					<div class="memberDetails last">
 						<xsl:attribute name="id"><xsl:value-of select="@name" /></xsl:attribute>

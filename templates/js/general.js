@@ -51,7 +51,7 @@
 		currentPage = parts[1];
 
 		$("#classView a.selected").removeClass('selected');
-		$("#classView a[href='" + currentPage.replace(/^.*\/([^\/]+)$/, '$1') + "']").addClass('selected').parents("li.expandable").each(function() {
+		$("#classView a[href='" + currentPage.replace(/^.*\/([^\/]+)$/, '$1') + "']").addClass('selected').focus().parents("li.expandable").each(function() {
 			var li = $(this).removeClass("expandable").addClass("collapsable");
 
 			li.find("> div.expandable-hitarea").removeClass("expandable-hitarea").addClass("collapsable-hitarea");
