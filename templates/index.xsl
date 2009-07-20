@@ -11,7 +11,8 @@
 	<xsl:param name="target" />
 
 	<xsl:template name="namespace">
-		<li class="closed"><span><a href="#"><xsl:value-of select="@name" /></a></span>
+		<li class="closed">
+			<span class="namespace"><a href="#"><xsl:value-of select="@name" /></a></span>
 			<ul>
 				<xsl:for-each select="namespace">
 					<xsl:call-template name="namespace" />
@@ -20,45 +21,35 @@
 				<xsl:for-each select="class">
 					<xsl:call-template name="class" />
 				</xsl:for-each>
+
+				<xsl:for-each select="members/*">
+					<xsl:call-template name="member" />
+				</xsl:for-each>
 			</ul>
 		</li>
 	</xsl:template>
 
 	<xsl:template name="class">
-		<xsl:choose>
-			<xsl:when test="@alias-for">
-				<li>
-					<span class="alias">
-						<a class="aliasLink">
-							<xsl:attribute name="href">class_<xsl:value-of select="@alias-for" />.html</xsl:attribute>
-							<xsl:text><xsl:value-of select="@name" /></xsl:text>
-						</a>
-					</span>
-				</li>
-			</xsl:when>
+		<li>
+			<span class="class">
+				<a>
+					<xsl:attribute name="href">class_<xsl:value-of select="@fullname" />.html</xsl:attribute>
+					<xsl:text><xsl:value-of select="@name" /></xsl:text>
+				</a>
+			</span>
+		</li>
+	</xsl:template>
 
-			<xsl:when test="@static">
-				<li>
-					<span class="singleton">
-						<a>
-							<xsl:attribute name="href">class_<xsl:value-of select="@fullname" />.html</xsl:attribute>
-							<xsl:text><xsl:value-of select="@name" /></xsl:text>
-						</a>
-					</span>
-				</li>
-			</xsl:when>
-
-			<xsl:otherwise>
-				<li>
-					<span class="class">
-						<a>
-							<xsl:attribute name="href">class_<xsl:value-of select="@fullname" />.html</xsl:attribute>
-							<xsl:text><xsl:value-of select="@name" /></xsl:text>
-						</a>
-					</span>
-				</li>
-			</xsl:otherwise>
-		</xsl:choose>
+	<xsl:template name="member">
+		<li>
+			<span>
+				<xsl:attribute name="class"><xsl:value-of select="name()" /></xsl:attribute>
+				<a>
+					<xsl:attribute name="href">member_<xsl:value-of select="@fullname" />.html</xsl:attribute>
+					<xsl:text><xsl:value-of select="@name" /></xsl:text>
+				</a>
+			</span>
+		</li>
 	</xsl:template>
 
 	<xsl:template match="/">
@@ -100,6 +91,10 @@
 
 									<xsl:for-each select="model/class">
 										<xsl:call-template name="class" />
+									</xsl:for-each>
+
+									<xsl:for-each select="model/members/*">
+										<xsl:call-template name="member" />
 									</xsl:for-each>
 								</ul>
 							</li>

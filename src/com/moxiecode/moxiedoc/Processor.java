@@ -52,6 +52,7 @@ public class Processor {
 
 	public void process() throws XPathExpressionException, IOException, ParserConfigurationException, TransformerException, TransformerConfigurationException {
 		CommentParser parser = new CommentParser();
+		Vector<CommentBlock[]> blockArrays = new Vector<CommentBlock[]>();
 
 		// Setup output DOM Document
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -64,8 +65,71 @@ public class Processor {
 		// Parse all added files and add the comment data to XML structure
 		this.processedFileCount = 0;
 		for (File file : this.files) {
-			this.addToXml(parser.parse(file));
+			CommentBlock blocks[] = parser.parse(file);
+	
+			blockArrays.add(blocks);
+			this.addToXml(blocks);
+
 			this.processedFileCount++;
+		}
+
+		// Process all member blocks
+		for (CommentBlock[] blocks : blockArrays)  {
+			for (CommentBlock block : blocks)  {
+				if (block.hasTag("member")) {
+					Element memberElm = buildMember(block);
+					String memberOf = block.getTag("member").getText();
+
+					if (memberElm != null) {
+						// Check for specific namespace
+						Element nsElm = XPathHelper.findElement("//namespace[@fullname='" + memberOf + "']", this.doc);
+						if (nsElm != null && nsElm.getAttribute("fullname").equals(memberOf)) {
+							memberElm.setAttribute("fullname", memberOf + "." + memberElm.getAttribute("name"));
+
+							Element membersElm = XPathHelper.findElement("members", nsElm);
+
+							if (membersElm == null)
+								membersElm = (Element) nsElm.appendChild(this.doc.createElement("members"));
+
+							membersElm.appendChild(memberElm);
+						} else {
+							// Check case specific class name
+							Element classElm = XPathHelper.findElement("//class[@fullname='" + memberOf + "']", this.doc);
+							if (classElm != null && classElm.getAttribute("fullname").equals(memberOf)) {
+								Element targetElm = XPathHelper.findElement("members", classElm);
+	
+								if (targetElm == null)
+									targetElm = (Element) classElm.appendChild(this.doc.createElement("members"));
+	
+								// Force member static if class is static
+								if (classElm.hasAttribute("static"))
+									memberElm.setAttribute("static", "true");
+	
+								// Stick member into class
+								targetElm.appendChild(memberElm);
+							} else {
+								Element targetElm = this.doc.getDocumentElement();
+
+								if (memberOf.length() > 0)
+									memberElm.setAttribute("fullname", memberOf + "." + memberElm.getAttribute("name"));
+								else
+									memberElm.setAttribute("fullname", memberElm.getAttribute("name"));
+
+								// Create namespace
+								if (memberOf.length() > 0)
+									targetElm = makeNameSpace(memberOf, false);
+	
+								Element membersElm = XPathHelper.findElement("members", targetElm);
+	
+								if (membersElm == null)
+									membersElm = (Element) targetElm.appendChild(this.doc.createElement("members"));
+	
+								membersElm.appendChild(memberElm);
+							}
+						}
+					}
+				}
+			}
 		}
 
 		// Build inheritage
@@ -126,10 +190,18 @@ public class Processor {
 		// Generate HTML using XSLT
 		transform("index.xsl", "index.html", "index");
 
+		// Process classes
 		for (Element classElm : XPathHelper.findElements("//class", this.doc)) {
 			String className = classElm.getAttribute("fullname");
 
 			transform("class.xsl", "class_" + className + ".html", className);
+		}
+
+		// Process members out side classes
+		for (Element memberElm : XPathHelper.findElements("//method[@fullname]|//property[@fullname]|//event[@fullname]", this.doc)) {
+			String memberFullName = memberElm.getAttribute("fullname");
+
+			transform("member.xsl", "member_" + memberFullName + ".html", memberFullName);
 		}
 
 		// Copy resource files
@@ -199,13 +271,13 @@ public class Processor {
 		}
 	}
 
-	private Element makeNameSpace(String class_name) throws XPathExpressionException {
+	private Element makeNameSpace(String class_name, boolean skip_last) throws XPathExpressionException {
 		Element targetElm = this.doc.getDocumentElement();
 		String parts[] = class_name.split("\\.");
 		String namespace = "";
 	
 		// Create namespaces if needed
-		for (int i = 0; i < parts.length - 1; i++) {
+		for (int i = 0; i < parts.length - (skip_last ? 1 : 0); i++) {
 			if (i > 0)
 				namespace += ".";
 
@@ -233,7 +305,7 @@ public class Processor {
 
 	private Element addClass(CommentBlock block) throws XPathExpressionException {
 		String className = block.getTag("class").getText();
-		Element targetElm = makeNameSpace(className);
+		Element targetElm = makeNameSpace(className, true);
 
 		// Add class to namespace
 		Element classElm = this.doc.createElement("class");
@@ -245,19 +317,6 @@ public class Processor {
 
 		addTags(block, classElm);
 
-		// Add alias class
-		for(Tag aliasTag : block.getTags("alias")) {
-			Element aliasClassElm = this.doc.createElement("class");
-			String aliasClassName = aliasTag.getText();
-			Element aliasNameSpaceElm = makeNameSpace(aliasClassName);
-
-			aliasClassElm.setAttribute("alias-for", className);
-			aliasClassElm.setAttribute("name", getShortName(aliasClassName));
-			aliasClassElm.setAttribute("fullname", aliasClassName);
-
-			aliasNameSpaceElm.appendChild(aliasClassElm);
-		}
-		
 		return classElm;
 	}
 
@@ -357,6 +416,39 @@ public class Processor {
 		}
 	}
 
+	private Element buildMember(CommentBlock block) {
+		Element memberElm = null;
+
+		// Is method
+		if (block.hasTag("method")) {
+			memberElm = doc.createElement("method");
+			memberElm.setAttribute("name", block.getTag("method").getText());
+		}
+
+		// Is event
+		if (block.hasTag("event")) {
+			memberElm = doc.createElement("event");
+			memberElm.setAttribute("name", block.getTag("event").getText());
+		}
+
+		// Is option
+		if (block.hasTag("option")) {
+			memberElm = doc.createElement("option");
+			memberElm.setAttribute("name", block.getTag("option").getText());
+		}
+
+		// Is property
+		if (block.hasTag("property")) {
+			memberElm = doc.createElement("property");
+			memberElm.setAttribute("name", block.getTag("property").getText());
+		}
+
+		if (memberElm != null)
+			addTags(block, memberElm);
+
+		return memberElm;
+	}
+	
 	private void addToXml(CommentBlock[] blocks) throws XPathExpressionException {
 		Element classElm = null;
 		boolean isStaticClass = false;
@@ -366,45 +458,22 @@ public class Processor {
 				classElm = addClass(block);
 				isStaticClass = block.hasTag("static");
 			} else {
-				Element memberElm = null;
-				Element members;
+				Element memberElm;
+				Element targetElm;
 
-				if (classElm != null) {
-					members = XPathHelper.findElement("members", classElm);
-					if (members == null)
-						members = (Element) classElm.appendChild(this.doc.createElement("members"));
+				if (classElm != null && !block.hasTag("member")) {
+					targetElm = XPathHelper.findElement("members", classElm);
+					if (targetElm == null)
+						targetElm = (Element) classElm.appendChild(this.doc.createElement("members"));
 
-					// Is method
-					if (block.hasTag("method")) {
-						memberElm = doc.createElement("method");
-						memberElm.setAttribute("name", block.getTag("method").getText());
-					}
-
-					// Is event
-					if (block.hasTag("event")) {
-						memberElm = doc.createElement("event");
-						memberElm.setAttribute("name", block.getTag("event").getText());
-					}
-
-					// Is option
-					if (block.hasTag("option")) {
-						memberElm = doc.createElement("option");
-						memberElm.setAttribute("name", block.getTag("option").getText());
-					}
-
-					// Is property
-					if (block.hasTag("property")) {
-						memberElm = doc.createElement("property");
-						memberElm.setAttribute("name", block.getTag("property").getText());
-					}
+					memberElm = buildMember(block);
 
 					if (memberElm != null) {
-						// Whole class is static
+						// Whole class is static, force member static
 						if (isStaticClass)
 							memberElm.setAttribute("static", "true");
 
-						addTags(block, memberElm);
-						members.appendChild(memberElm);
+						targetElm.appendChild(memberElm);
 					}
 				}
 			}

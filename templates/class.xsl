@@ -119,6 +119,13 @@
 				<td class="last"><xsl:value-of select="//class[@fullname=$target]/@name" /></td>
 			</tr>
 
+			<xsl:if test="//class[@fullname=$target]/@static">
+				<tr>
+					<td class="first">Type</td>
+					<td class="last">Singleton</td>
+				</tr>
+			</xsl:if>
+
 			<xsl:if test="//class[@fullname=$target]/super-classes/class-ref">
 				<tr>
 					<td class="first">Inheritance</td>
@@ -138,18 +145,6 @@
 									<xsl:value-of select="//class[@fullname=$class]/@name" />
 								</a>
 							</span>
-						</xsl:for-each>
-					</td>
-				</tr>
-			</xsl:if>
-
-			<xsl:if test="//class[@alias-for=$target]">
-				<tr>
-					<td class="first">Aliases</td>
-					<td class="last aliasesList">
-						<xsl:for-each select="//class[@alias-for=$target]">
-							<xsl:value-of select="@fullname" />
-							<xsl:if test="position() != last()">, </xsl:if>
 						</xsl:for-each>
 					</td>
 				</tr>
@@ -257,7 +252,7 @@
 		<xsl:param name="singular" />
 		<xsl:param name="plural" />
 
-		<xsl:if test="//class[@fullname=$target]/members/*[name()=$type]">
+		<xsl:if test="//class[@fullname=$target]/members/*[name()=$type][not(@inherited-from)]">
 			<div class="details">
 				<h2><xsl:value-of select="$singular" /> details</h2>
 

@@ -62,12 +62,14 @@ cursor: pointer;
 
 .classtree li { padding: 3px 0 2px 16px; }
 
-.classtree span.root, .classtree span.class, .classtree span.singleton, .classtree span.alias {
+.classtree span {
 	padding: 1px 0 1px 18px;
 	display: block;
-	background: url(../img/root.gif) 0 3px no-repeat;
 }
 
-.classtree span.class { background: url(../img/class.gif) 0 3px no-repeat; }
-.classtree span.singleton { background: url(../img/singleton.gif) 0 3px no-repeat; }
-.classtree span.alias { background: url(../img/alias.gif) 0 3px no-repeat; }
+.classtree span.root { background: url(../img/root.gif) 0 3px no-repeat;}
+.classtree span.namespace { background: url(../img/namespace.gif) 0 0 no-repeat;}
+.classtree span.class { background: url(../img/class.gif) 0 0 no-repeat; }
+.classtree span.property { background: url(../img/property.gif) 0 0 no-repeat; }
+.classtree span.method { background: url(../img/method.gif) 0 0 no-repeat; }
+.classtree span.event { background: url(../img/event.gif) 0 0 no-repeat; }

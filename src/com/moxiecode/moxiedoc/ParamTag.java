@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 public class ParamTag extends Tag {
 	protected String type;
 	protected String paramName;
-	protected String paramText;
 
 	public ParamTag(String name, String text, SourcePosition pos) {
 		super(name, text, pos);

@@ -51,7 +51,12 @@
 		currentPage = parts[1];
 
 		$("#classView a.selected").removeClass('selected');
-		$("#classView a[href='" + currentPage.replace(/^.*\/([^\/]+)$/, '$1') + "']:not(.aliasLink)").addClass('selected');
+		$("#classView a[href='" + currentPage.replace(/^.*\/([^\/]+)$/, '$1') + "']").addClass('selected').parents("li.expandable").each(function() {
+			var li = $(this).removeClass("expandable").addClass("collapsable");
+
+			li.find("> div.expandable-hitarea").removeClass("expandable-hitarea").addClass("collapsable-hitarea");
+			li.find("> ul").show();
+		});
 
 		$.get(parts[1], "", function(data) {
 			data = /<body[^>]*>([\s\S]+)<\/body>/.exec(data);
@@ -79,13 +84,15 @@
 		$("a").live("click", function(e) {
 			var url = e.target.href;
 
-			if (url.indexOf('class_') != -1) {
-				document.location.hash = e.target.href.replace(/^.*\/([^\/]+)/, '$1').replace(/#/g, '-');
+			if (e.button == 0) {
+				if (url.indexOf('class_') != -1 || url.indexOf('alias_') != -1 || url.indexOf('member_') != -1) {
+					document.location.hash = e.target.href.replace(/^.*\/([^\/]+)/, '$1').replace(/#/g, '-');
 
-				loadURL(url);
+					loadURL(url);
+				}
+
+				e.preventDefault();
 			}
-
-			e.preventDefault();
 		});
 	});
 })(jQuery);
