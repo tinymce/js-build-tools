@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:output
-		method="html"
+		method="xml"
 		indent="yes"
 		omit-xml-declaration="yes"
 		doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
@@ -9,21 +9,26 @@
 	/>
 
 	<xsl:param name="target" />
+	<xsl:preserve-space elements="*" />
 
 	<xsl:template match="/">
 		<html>
 		<head>
 			<title>Class: <xsl:value-of select="//class[@fullname=$target]/@fullname" /></title>
-			<meta name="generator" content="MoxieDoc" />
+			<xsl:text disable-output-escaping="yes"><![CDATA[
+<meta name="generator" content="MoxieDoc" />
 
-			<link rel="stylesheet" type="text/css" href="css/reset.css" />
-			<link rel="stylesheet" type="text/css" href="css/grids.css" />
-			<link rel="stylesheet" type="text/css" href="css/general.css" />
+<link rel="stylesheet" type="text/css" href="css/reset.css" />
+<link rel="stylesheet" type="text/css" href="css/grids.css" />
+<link rel="stylesheet" type="text/css" href="css/general.css" />
 
-			<script type="text/javascript">
-				// Load through index instead
-				document.location = 'index.html#' + document.location.pathname.replace(/^.+\/([^\/]+)$/, '$1');
-			</script>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load("jquery", "1.3");
+</script>
+<script type="text/javascript" src="js/jquery.treeview.min.js"></script>
+<script type="text/javascript" src="js/general.js"></script>
+]]></xsl:text>
 		</head>
 		<body>
 			<div class="classDetailsContent">

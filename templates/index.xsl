@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:output
-		method="html"
+		method="xml"
 		indent="yes"
 		omit-xml-declaration="yes"
 		doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
@@ -9,6 +9,7 @@
 	/>
 
 	<xsl:param name="target" />
+	<xsl:preserve-space elements="*" />
 
 	<xsl:template name="namespace">
 		<li class="closed">
@@ -56,19 +57,21 @@
 		<html xmlns="http://www.w3.org/1999/xhtml">
 		<head>
 			<title>TinyMCE API</title>
-			<meta name="generator" content="MoxieDoc" />
+			<xsl:text disable-output-escaping="yes"><![CDATA[
+<meta name="generator" content="MoxieDoc" />
 
-			<link rel="stylesheet" type="text/css" href="css/reset.css" />
-			<link rel="stylesheet" type="text/css" href="css/grids.css" />
-			<link rel="stylesheet" type="text/css" href="css/general.css" />
-			<link rel="stylesheet" type="text/css" href="css/jquery.treeview.css" />
+<link rel="stylesheet" type="text/css" href="css/reset.css" />
+<link rel="stylesheet" type="text/css" href="css/grids.css" />
+<link rel="stylesheet" type="text/css" href="css/general.css" />
+<link rel="stylesheet" type="text/css" href="css/jquery.treeview.css" />
 
-			<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-			<script type="text/javascript">
-				google.load("jquery", "1.3");
-			</script>
-			<script type="text/javascript" src="js/jquery.treeview.min.js"></script>
-			<script type="text/javascript" src="js/general.js"></script>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load("jquery", "1.3");
+</script>
+<script type="text/javascript" src="js/jquery.treeview.min.js"></script>
+<script type="text/javascript" src="js/general.js"></script>
+]]></xsl:text>
 		</head>
 		<body>
 			<div id="doc3" class="yui-t1" style="height:500px">
