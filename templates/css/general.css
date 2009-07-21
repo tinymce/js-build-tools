@@ -225,3 +225,7 @@ code.syntax {
 .static {
 	color: gray;
 }
+
+.version span, .author span {
+	font-weight: bold;
+}

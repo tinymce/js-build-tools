@@ -46,6 +46,18 @@
 					<xsl:value-of select="//class[@fullname=$target]/description/text()" />
 				</div>
 
+				<xsl:if test="//class[@fullname=$target]/@version">
+					<div class="version">
+						<span>Version:</span> <xsl:value-of select="//class[@fullname=$target]/@version" />
+					</div>
+				</xsl:if>
+
+				<xsl:if test="//class[@fullname=$target]/@author">
+					<div class="version">
+						<span>Author(s):</span> <xsl:value-of select="//class[@fullname=$target]/@author" />
+					</div>
+				</xsl:if>
+
 				<!-- Output examples -->
 				<xsl:if test="//class[@fullname=$target]/example">
 					<xsl:for-each select="//class[@fullname=$target]/example">
@@ -297,9 +309,23 @@
 						<xsl:text>:</xsl:text>
 						<xsl:choose>
 							<xsl:when test="return">
-								<xsl:call-template name="type_name">
-									<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
-								</xsl:call-template>
+								<xsl:choose>
+									<xsl:when test="return/@type">
+										<xsl:call-template name="type_name">
+											<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
+										</xsl:call-template>
+									</xsl:when>
+
+									<xsl:otherwise>
+										<xsl:for-each select="return/type">
+											<xsl:call-template name="type_name">
+												<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+											</xsl:call-template>
+
+											<xsl:if test="position() != last()">/</xsl:if>
+										</xsl:for-each>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:when>
 
 							<xsl:otherwise>void</xsl:otherwise>
@@ -319,6 +345,16 @@
 							<xsl:call-template name="type_name">
 								<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
 							</xsl:call-template>
+						</xsl:when>
+
+						<xsl:when test="type">
+							<xsl:for-each select="type">
+								<xsl:call-template name="type_name">
+									<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+								</xsl:call-template>
+
+								<xsl:if test="position() != last()">/</xsl:if>
+							</xsl:for-each>
 						</xsl:when>
 
 						<xsl:otherwise>Object</xsl:otherwise>
@@ -394,11 +430,26 @@
 						<!-- Output return type -->
 						<xsl:if test="not(@constructor)">
 							<xsl:text>:</xsl:text>
+
 							<xsl:choose>
 								<xsl:when test="return">
-									<xsl:call-template name="type_name">
-										<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
-									</xsl:call-template>
+									<xsl:choose>
+										<xsl:when test="return/@type">
+											<xsl:call-template name="type_name">
+												<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
+											</xsl:call-template>
+										</xsl:when>
+
+										<xsl:otherwise>
+											<xsl:for-each select="return/type">
+												<xsl:call-template name="type_name">
+													<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+												</xsl:call-template>
+
+												<xsl:if test="position() != last()">/</xsl:if>
+											</xsl:for-each>
+										</xsl:otherwise>
+									</xsl:choose>
 								</xsl:when>
 
 								<xsl:otherwise>void</xsl:otherwise>
@@ -429,6 +480,18 @@
 
 			<div class="memberDescription"><xsl:value-of select="description/text()" disable-output-escaping="yes" /></div>
 
+			<xsl:if test="@version">
+				<div class="version">
+					<span>Version:</span> <xsl:value-of select="@version" />
+				</div>
+			</xsl:if>
+
+			<xsl:if test="@author">
+				<div class="author">
+					<span>Author(s):</span> <xsl:value-of select="@author" />
+				</div>
+			</xsl:if>
+
 			<!-- Output parameters -->
 			<xsl:if test="param">
 				<h4>Parameters</h4>
@@ -439,9 +502,26 @@
 							<td class="first">
 								<xsl:value-of select="@name" />
 								<xsl:text>:</xsl:text>
-								<xsl:call-template name="type_name">
-									<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
-								</xsl:call-template>
+
+								<xsl:choose>
+									<xsl:when test="@type">
+										<xsl:call-template name="type_name">
+											<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
+										</xsl:call-template>
+									</xsl:when>
+
+									<xsl:when test="type">
+										<xsl:for-each select="type">
+											<xsl:call-template name="type_name">
+												<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+											</xsl:call-template>
+
+											<xsl:if test="position() != last()">/</xsl:if>
+										</xsl:for-each>
+									</xsl:when>
+
+									<xsl:otherwise>Object</xsl:otherwise>
+								</xsl:choose>
 							</td>
 							<td class="last"><xsl:value-of select="description/text()" /></td>
 						</tr>
@@ -453,9 +533,23 @@
 			<xsl:if test="return">
 				<h4>Returns</h4>
 				<div class="returns">
-					<xsl:call-template name="type_name">
-						<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
-					</xsl:call-template>
+					<xsl:choose>
+						<xsl:when test="return/@type">
+							<xsl:call-template name="type_name">
+								<xsl:with-param	name="type"><xsl:value-of select="return/@type" /></xsl:with-param>
+							</xsl:call-template>
+						</xsl:when>
+
+						<xsl:otherwise>
+							<xsl:for-each select="return/type">
+								<xsl:call-template name="type_name">
+									<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+								</xsl:call-template>
+
+								<xsl:if test="position() != last()">/</xsl:if>
+							</xsl:for-each>
+						</xsl:otherwise>
+					</xsl:choose>
 
 					<xsl:text> - <xsl:value-of select="return/description/text()" /></xsl:text>
 				</div>
@@ -519,9 +613,26 @@
 		<xsl:for-each select="param">
 			<xsl:value-of select="@name" />
 			<xsl:text>:</xsl:text>
-			<xsl:call-template name="type_name">
-				<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
-			</xsl:call-template>
+
+			<xsl:choose>
+				<xsl:when test="@type">
+					<xsl:call-template name="type_name">
+						<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+
+				<xsl:when test="type">
+					<xsl:for-each select="type">
+						<xsl:call-template name="type_name">
+							<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+						</xsl:call-template>
+
+						<xsl:if test="position() != last()">/</xsl:if>
+					</xsl:for-each>
+				</xsl:when>
+
+				<xsl:otherwise>Object</xsl:otherwise>
+			</xsl:choose>
 
 			<xsl:if test="position() != last()">, </xsl:if>
 		</xsl:for-each>
