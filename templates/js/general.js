@@ -63,6 +63,10 @@
 
 			if (data) {
 				$('#detailsView').html(data[1])[0].scrollTop = 0;
+
+				SyntaxHighlighter.config.clipboardSwf = 'js/clipboard.swf';
+				SyntaxHighlighter.highlight({gutter : false});
+
 				scrollToHash(hash);
 			}
 		});

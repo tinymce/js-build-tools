@@ -14,7 +14,7 @@ margin-top: 4px;
 }
 
 .treeview .hitarea {
-background: url(../img/treeview-default.gif) -64px -25px no-repeat;
+background: transparent -64px -25px no-repeat;
 height: 16px;
 width: 16px;
 margin-left: -16px;
@@ -39,13 +39,12 @@ cursor: pointer;
 
 #treecontrol { margin: 1em 0; display: none; }
 
-.treeview li { background: url(../img/treeview-default-line.gif) 0 0 no-repeat; }
+.treeview li { background: transparent 0 0 no-repeat; }
 .treeview li.collapsable, .treeview li.expandable { background-position: 0 -176px; }
 
 .treeview .expandable-hitarea { background-position: -80px -3px; }
 
 .treeview li.last { background-position: 0 -1766px }
-.treeview li.lastCollapsable, .treeview li.lastExpandable { background-image: url(../img/treeview-default.gif); }
 
 .treeview li.lastCollapsable { background-position: 0 -111px }
 

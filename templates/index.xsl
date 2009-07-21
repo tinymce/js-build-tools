@@ -64,6 +64,8 @@
 <link rel="stylesheet" type="text/css" href="css/grids.css" />
 <link rel="stylesheet" type="text/css" href="css/general.css" />
 <link rel="stylesheet" type="text/css" href="css/jquery.treeview.css" />
+<link type="text/css" rel="stylesheet" href="css/shCore.css" />
+<link type="text/css" rel="stylesheet" href="css/shThemeMoxieDoc.css" />
 
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -71,6 +73,8 @@
 </script>
 <script type="text/javascript" src="js/jquery.treeview.min.js"></script>
 <script type="text/javascript" src="js/general.js"></script>
+<script type="text/javascript" src="js/shCore.js"></script>
+<script type="text/javascript" src="js/shBrushJScript.js"></script>
 ]]></xsl:text>
 		</head>
 		<body>

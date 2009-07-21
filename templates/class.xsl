@@ -46,6 +46,16 @@
 					<xsl:value-of select="//class[@fullname=$target]/description/text()" />
 				</div>
 
+				<!-- Output examples -->
+				<xsl:if test="//class[@fullname=$target]/example">
+					<xsl:for-each select="//class[@fullname=$target]/example">
+						<h4>Example</h4>
+						<pre class="brush: js;">
+							<xsl:value-of select="example/text()" disable-output-escaping="yes" />
+						</pre>
+					</xsl:for-each>
+				</xsl:if>
+
 				<div class="summaryLists">
 					<!-- Option summary -->
 					<xsl:call-template name="member_summary_list">
@@ -495,8 +505,8 @@
 			<!-- Output examples -->
 			<xsl:if test="example">
 				<xsl:for-each select="example">
-					<h3>Example</h3>
-					<pre>
+					<h4>Example</h4>
+					<pre class="brush: js;">
 						<xsl:value-of select="example/text()" disable-output-escaping="yes" />
 					</pre>
 				</xsl:for-each>
