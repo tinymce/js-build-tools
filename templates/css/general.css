@@ -5,6 +5,9 @@ body, html {
 
 #doc3 {
 	margin: 0;
+
+	/* Fix for scrolling issue on Gecko */
+	position: fixed; width: 100%; top: 0; left: 0;
 }
 
 #bd, #bd, #yui-main, #detailsView, #classView {
