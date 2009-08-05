@@ -4,15 +4,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ParamTag extends Tag {
-	protected String type;
+	protected String[] types;
 	protected String paramName;
 
 	public ParamTag(String name, String text, SourcePosition pos) {
 		super(name, text, pos);
 	}
 
-	public String getType() {
-		return this.type;
+	public String[] getTypes() {
+		return this.types;
 	}
 
 	public String getParameterName() {
@@ -20,7 +20,7 @@ public class ParamTag extends Tag {
 	}
 
 	public String toString() {
-		return this.name + "=" + this.getType() + "," + this.getParameterName() + "," + this.getText() + " (" + this.sourcePosition + ")";
+		return this.name + "=" + this.getTypes() + "," + this.getParameterName() + "," + this.getText() + " (" + this.sourcePosition + ")";
 	}
 
 	// Package methods
@@ -32,7 +32,7 @@ public class ParamTag extends Tag {
 		Matcher tagMatcher = tagPattern.matcher(text);
 
 		if (tagMatcher.matches()) {
-			this.type = tagMatcher.group(1).trim();
+			this.types = tagMatcher.group(1).trim().split("/");
 			this.paramName = tagMatcher.group(2).trim();
 			this.text = tagMatcher.group(3).trim();
 		}

@@ -4,18 +4,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReturnTag extends Tag {
-	protected String type;
+	protected String[] types;
 
 	public ReturnTag(String name, String text, SourcePosition pos) {
 		super(name, text, pos);
 	}
 
-	public String getType() {
-		return this.type;
+	public String[] getTypes() {
+		return this.types;
 	}
 
 	public String toString() {
-		return this.name + "=" + this.getType() + "," + this.getText() + " (" + this.sourcePosition + ")";
+		return this.name + "=" + this.getTypes() + "," + this.getText() + " (" + this.sourcePosition + ")";
 	}
 
 	// Package methods
@@ -27,7 +27,7 @@ public class ReturnTag extends Tag {
 		Matcher tagMatcher = tagPattern.matcher(text);
 
 		if (tagMatcher.matches()) {
-			this.type = tagMatcher.group(1).trim();
+			this.types = tagMatcher.group(1).trim().split("/");
 			this.text = tagMatcher.group(2).trim();
 		}
 	}

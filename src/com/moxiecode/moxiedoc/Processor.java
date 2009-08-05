@@ -324,7 +324,7 @@ public class Processor {
 		Document doc = elm.getOwnerDocument();
 
 		// Add value properties
-		String valueProps[] = {"name", "extends", "type", "deprecated"};
+		String valueProps[] = {"name", "extends", "type", "deprecated", "version", "author"};
 		for (String name : valueProps) {
 			if (block.hasTag(name))
 				elm.setAttribute(name, block.getTag(name).getText());
@@ -360,7 +360,19 @@ public class Processor {
 
 			// Add name/type
 			paramElm.setAttribute("name", paramTag.getParameterName());
-			paramElm.setAttribute("type", paramTag.getType());
+
+			// Add types
+			String[] types = paramTag.getTypes();
+			if (types != null && types.length > 1) {
+				for (String type : types) {
+					Element typeElm = this.doc.createElement("type");
+
+					typeElm.setAttribute("fullname", type);
+
+					paramElm.appendChild(typeElm);
+				}
+			} else if (types != null && types.length == 1)
+				paramElm.setAttribute("type", types[0]);
 
 			// Add description
 			Element paramDescriptionElm = doc.createElement("description");
@@ -378,7 +390,18 @@ public class Processor {
 			Element returnElm = doc.createElement("return");
 			Element returnDescriptionElm = doc.createElement("description");
 
-			returnElm.setAttribute("type", returnTag.getType());
+			// Add types
+			String[] types = returnTag.getTypes();
+			if (types != null && types.length > 1) {
+				for (String type : types) {
+					Element typeElm = this.doc.createElement("type");
+
+					typeElm.setAttribute("fullname", type);
+
+					returnElm.appendChild(typeElm);
+				}
+			} else if (types != null && types.length == 1)
+				returnElm.setAttribute("type", types[0]);
 
 			returnDescriptionElm.appendChild(doc.createTextNode(returnTag.getText()));
 			returnElm.appendChild(returnDescriptionElm);
