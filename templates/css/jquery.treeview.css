@@ -72,3 +72,4 @@ cursor: pointer;
 .classtree span.property { background: url(../img/property.gif) 0 0 no-repeat; }
 .classtree span.method { background: url(../img/method.gif) 0 0 no-repeat; }
 .classtree span.event { background: url(../img/event.gif) 0 0 no-repeat; }
+.classtree span.singleton { background: url(../img/static.gif) 0 0 no-repeat; }

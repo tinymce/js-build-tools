@@ -13,7 +13,7 @@
 
 	<xsl:template name="namespace">
 		<li class="closed">
-			<span class="namespace"><a href="#"><xsl:value-of select="@name" /></a></span>
+			<span class="namespace" title="Namespace"><a href="#"><xsl:value-of select="@name" /></a></span>
 			<ul>
 				<xsl:for-each select="namespace">
 					<xsl:call-template name="namespace" />
@@ -32,7 +32,12 @@
 
 	<xsl:template name="class">
 		<li>
-			<span class="class">
+			<span class="class" title="Class">
+				<xsl:if test="@static">
+					<xsl:attribute name="class">singleton</xsl:attribute>
+					<xsl:attribute name="title">Singleton class</xsl:attribute>
+				</xsl:if>
+
 				<a>
 					<xsl:attribute name="href">class_<xsl:value-of select="@fullname" />.html</xsl:attribute>
 					<xsl:text><xsl:value-of select="@name" /></xsl:text>
@@ -43,7 +48,7 @@
 
 	<xsl:template name="member">
 		<li>
-			<span>
+			<span class="Member">
 				<xsl:attribute name="class"><xsl:value-of select="name()" /></xsl:attribute>
 				<a>
 					<xsl:attribute name="href">member_<xsl:value-of select="@fullname" />.html</xsl:attribute>
