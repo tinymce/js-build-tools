@@ -30,7 +30,7 @@ import com.moxiecode.moxiedoc.util.XPathHelper;
 public class Processor {
 	private int processedFileCount;
 	private Vector<File> files;
-	private File outDir;
+	private File outDir, intelliSenseFile;
 	private Document doc;
 	private File templateDir;
 
@@ -48,6 +48,10 @@ public class Processor {
 
 	public void setOutDir(File outdir) {
 		this.outDir = outdir;
+	}
+
+	public void setMsIntelliSenseFile(File intelli_file) {
+		this.intelliSenseFile = intelli_file;
 	}
 
 	public void process() throws XPathExpressionException, IOException, ParserConfigurationException, TransformerException, TransformerConfigurationException {
@@ -187,6 +191,12 @@ public class Processor {
 		// Serialize XML structure
 		this.serializeDocument(this.doc, new File(this.outDir, "model.xml"));
 
+		if (this.intelliSenseFile != null) {
+			IntelliSenseGenerator generator = new IntelliSenseGenerator(this.doc);
+
+			generator.generate(this.intelliSenseFile);
+		}
+
 		// Generate HTML using XSLT
 		transform("index.xsl", "index.html", "index");
 
@@ -211,6 +221,8 @@ public class Processor {
 		}
 	}
 
+
+	
 	public int getProcessedFileCount() {
 		return this.processedFileCount;
 	}
@@ -343,7 +355,7 @@ public class Processor {
 		elm.appendChild(descriptionElm);
 
 		// Add summary
-		String summary = block.getText().replaceAll("<[^>]+>", "");
+		String summary = block.getText().replaceAll("<[^>]+>", "").replaceAll("[\\r\\n]+", " ").trim();
 		int dotIdx = summary.indexOf('.');
 
 		if (dotIdx != -1)
