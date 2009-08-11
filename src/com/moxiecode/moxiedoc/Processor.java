@@ -30,7 +30,7 @@ import com.moxiecode.moxiedoc.util.XPathHelper;
 public class Processor {
 	private int processedFileCount;
 	private Vector<File> files;
-	private File outDir, intelliSenseFile;
+	private File outDir, msIntelliSenseFile;
 	private Document doc;
 	private File templateDir;
 
@@ -51,7 +51,7 @@ public class Processor {
 	}
 
 	public void setMsIntelliSenseFile(File intelli_file) {
-		this.intelliSenseFile = intelli_file;
+		this.msIntelliSenseFile = intelli_file;
 	}
 
 	public void process() throws XPathExpressionException, IOException, ParserConfigurationException, TransformerException, TransformerConfigurationException {
@@ -191,10 +191,11 @@ public class Processor {
 		// Serialize XML structure
 		this.serializeDocument(this.doc, new File(this.outDir, "model.xml"));
 
-		if (this.intelliSenseFile != null) {
+		// Generate MS intellisense file
+		if (this.msIntelliSenseFile != null) {
 			IntelliSenseGenerator generator = new IntelliSenseGenerator(this.doc);
 
-			generator.generate(this.intelliSenseFile);
+			generator.generateToMsFormat(this.msIntelliSenseFile);
 		}
 
 		// Generate HTML using XSLT

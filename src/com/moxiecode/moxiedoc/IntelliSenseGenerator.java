@@ -2,6 +2,9 @@ package com.moxiecode.moxiedoc;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.Vector;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -17,22 +20,24 @@ public class IntelliSenseGenerator {
 		this.doc = doc;
 	}
 
-	public void generate(File out_file) throws IOException, XPathExpressionException {
-		java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(out_file.getAbsolutePath()));
+	public void generateToMsFormat(File out_file) throws IOException, XPathExpressionException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(out_file.getAbsolutePath()));
 
 		try {
 			boolean first;
+			Vector<String> namespaces = new Vector<String>();
 
 			// Output namespaces
 			writer.write("// Namespaces\n");
 			for (Element namespaceElm : XPathHelper.findElements("//namespace", this.doc)) {
 				writer.write(namespaceElm.getAttribute("fullname") + " = {}\n");
+				namespaces.add(namespaceElm.getAttribute("fullname"));
 			}
-
+			
 			// Output classes
 			writer.write("\n// Classes\n");
 			for (Element classElm : XPathHelper.findElements("//class", this.doc)) {
-				if (classElm.getAttribute("name").equals("tinymce"))
+				if (namespaces.contains(classElm.getAttribute("name")))
 					continue;
 
 				writer.write(classElm.getAttribute("fullname") + " = function(");
@@ -56,11 +61,8 @@ public class IntelliSenseGenerator {
 
 				// Write constructor parameters
 				if (constructorElm != null) {
-					for (Element paramElm : XPathHelper.findElements("param", constructorElm)) {
-						Element paramSummaryElm = XPathHelper.findElement("description", paramElm);
-						if (paramSummaryElm != null)
-							writer.write("\t/// <param name=\"" + paramElm.getAttribute("name").replaceAll("[.]", "") + "\" type=\"" + paramElm.getAttribute("type") + "\">" + paramSummaryElm.getTextContent().replaceAll("[\r\n]", " ") + "</param>\n");
-					}
+					for (Element paramElm : XPathHelper.findElements("param", constructorElm))
+						writeParam(paramElm, writer);
 				}
 
 				// Write fields
@@ -98,20 +100,11 @@ public class IntelliSenseGenerator {
 						writer.write("\t/// <summary>" + methodElm.getAttribute("summary") + "</summary>\n");
 
 						// Write parameters
-						for (Element paramElm : XPathHelper.findElements("param", methodElm)) {
-							Element paramSummaryElm = XPathHelper.findElement("description", paramElm);
-							if (paramSummaryElm != null)
-								writer.write("\t/// <param name=\"" + paramElm.getAttribute("name").replaceAll("[.]", "") + "\" type=\"" + paramElm.getAttribute("type") + "\">" + paramSummaryElm.getTextContent().replaceAll("[\r\n]", " ") + "</param>\n");
-						}
+						for (Element paramElm : XPathHelper.findElements("param", methodElm))
+							writeParam(paramElm, writer);
 
 						// Write returns
-						Element returnElm = XPathHelper.findElement("return", methodElm);
-						if (returnElm != null) {
-							writer.write(
-									"\t/// <returns type=\"" + returnElm.getAttribute("type") + "\">" + 
-									returnElm.getTextContent().replaceAll("[\r\n]", " ") + "</returns>\n"
-							);
-						}
+						writeReturn(XPathHelper.findElement("return", methodElm), writer);
 
 						writer.write("}\n\n");
 					}
@@ -119,6 +112,40 @@ public class IntelliSenseGenerator {
 			}
 		} finally {
 			writer.close();
+		}
+	}
+
+	private void writeParam(Element param_elm, BufferedWriter writer) throws IOException {
+		if (param_elm != null) {
+			writer.write("\t/// <param name=\"" + param_elm.getAttribute("name").replaceAll("[.]", "") + "\" type=\"" + param_elm.getAttribute("type") + "\"");
+
+			// Handle element type
+			if (param_elm.getAttribute("type").equals("Element"))
+				writer.write(" domElement=\"true\"");
+
+			// Handle integer type
+			if (param_elm.getAttribute("type").equals("Number"))
+				writer.write(" integer=\"true\"");
+
+			// Write summary
+			writer.write(">" + param_elm.getTextContent().replaceAll("[\r\n]", " ") + "</param>\n");
+		}
+	}
+
+	private void writeReturn(Element return_elm, BufferedWriter writer) throws IOException {
+		if (return_elm != null) {
+			writer.write("\t/// <returns type=\"" + return_elm.getAttribute("type") + "\"");
+
+			// Handle element type
+			if (return_elm.getAttribute("type").equals("Element"))
+				writer.write(" domElement=\"true\"");
+
+			// Handle integer type
+			if (return_elm.getAttribute("type").equals("Number"))
+				writer.write(" integer=\"true\"");
+
+			// Write summary
+			writer.write(">" + return_elm.getTextContent().replaceAll("[\r\n]", " ") + "</returns>\n");
 		}
 	}
 }
