@@ -37,7 +37,7 @@ public class IntelliSenseGenerator {
 			}
 
 			// Output classes
-			writer.write("// Classes\n");
+			writer.write("\n// Classes\n");
 			for (Element classElm : XPathHelper.findElements("//class", this.doc)) {
 				if (namespaces.contains(classElm.getAttribute("name")))
 					continue;
@@ -101,6 +101,28 @@ public class IntelliSenseGenerator {
 				for (Element methodElm : XPathHelper.findElements("members/method|//class[@fullname='" + namespace + "']/members/method", namespaceElm))
 					writeMethod(namespace, methodElm, writer);
 			}
+
+			// Output global fields and methods
+
+			// Write fields
+			for (Element propertyElm : XPathHelper.findElements("model/members/property", this.doc)) {
+				Element classElm = XPathHelper.findElement("//class[@fullname='" + propertyElm.getAttribute("type") + "']", this.doc);
+
+				if (classElm != null) {
+					if (classElm.hasAttribute("static"))
+						writer.write(propertyElm.getAttribute("name") + " = " + propertyElm.getAttribute("type") + ";\n");
+					else
+						writer.write(propertyElm.getAttribute("name") + " = new " + propertyElm.getAttribute("type") + "();\n");
+				}
+			}
+
+			// Write events as fields
+			for (Element eventElm : XPathHelper.findElements("model/members/event", this.doc))
+				writer.write(eventElm.getAttribute("name") + " = new tinymce.util.Dispatcher();\n");
+
+			// Write methods
+			for (Element methodElm : XPathHelper.findElements("model/members/method", this.doc))
+				writeMethod(null, methodElm, writer);
 		} finally {
 			writer.close();
 		}
@@ -110,10 +132,13 @@ public class IntelliSenseGenerator {
 		boolean first;
 
 		if (method_elm != null && !method_elm.hasAttribute("constructor")) {
-			if (!method_elm.hasAttribute("static"))
-				writer.write(prefix + ".prototype." + method_elm.getAttribute("name") + " = function(");
-			else
-				writer.write(prefix + "." + method_elm.getAttribute("name") + " = function(");
+			if (prefix != null) {
+				if (!method_elm.hasAttribute("static"))
+					writer.write(prefix + ".prototype." + method_elm.getAttribute("name") + " = function(");
+				else
+					writer.write(prefix + "." + method_elm.getAttribute("name") + " = function(");
+			} else
+				writer.write("function " + method_elm.getAttribute("name") + "(");
 
 			first = true;
 			for (Element paramElm : XPathHelper.findElements("param", method_elm)) {
