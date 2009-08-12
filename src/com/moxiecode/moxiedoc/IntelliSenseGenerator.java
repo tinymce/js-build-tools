@@ -30,12 +30,14 @@ public class IntelliSenseGenerator {
 			// Output namespaces
 			writer.write("// Namespaces\n");
 			for (Element namespaceElm : XPathHelper.findElements("//namespace", this.doc)) {
-				writer.write(namespaceElm.getAttribute("fullname") + " = {}\n");
-				namespaces.add(namespaceElm.getAttribute("fullname"));
+				String namespace = namespaceElm.getAttribute("fullname");
+
+				writer.write(namespace + " = {}\n");
+				namespaces.add(namespace);
 			}
-			
+
 			// Output classes
-			writer.write("\n// Classes\n");
+			writer.write("// Classes\n");
 			for (Element classElm : XPathHelper.findElements("//class", this.doc)) {
 				if (namespaces.contains(classElm.getAttribute("name")))
 					continue;
@@ -67,54 +69,77 @@ public class IntelliSenseGenerator {
 
 				// Write fields
 				for (Element propertyElm : XPathHelper.findElements("members/property", classElm)) {
-					writer.write("\t/// <field name=\"" + propertyElm.getAttribute("name") + "\" type=\"" + propertyElm.getAttribute("type") + "\">" + propertyElm.getTextContent().replaceAll("[\r\n]", " ") + "</field>\n");
+					writer.write("\t/// <field name=\"" + propertyElm.getAttribute("name") + "\" type=\"" + propertyElm.getAttribute("type") + "\">" + trim(propertyElm.getTextContent()) + "</field>\n");
 				}
 
 				// Write events as fields
 				for (Element eventElm : XPathHelper.findElements("members/event", classElm)) {
-					writer.write("\t/// <field name=\"" + eventElm.getAttribute("name") + "\" type=\"tinymce.util.Dispatcher\">" + eventElm.getTextContent().replaceAll("[\r\n]", " ") + "</field>\n");
+					writer.write("\t/// <field name=\"" + eventElm.getAttribute("name") + "\" type=\"tinymce.util.Dispatcher\">" + trim(eventElm.getTextContent()) + "</field>\n");
 				}
 
 				writer.write("}\n\n");
-				
+	
 				// Write methods
-				for (Element methodElm : XPathHelper.findElements("members/method", classElm)) {
-					if (!methodElm.hasAttribute("constructor")) {
-						if (!methodElm.hasAttribute("static"))
-							writer.write(classElm.getAttribute("fullname") + ".prototype." + methodElm.getAttribute("name") + " = function(");
-						else
-							writer.write(classElm.getAttribute("fullname") + "." + methodElm.getAttribute("name") + " = function(");
+				for (Element methodElm : XPathHelper.findElements("members/method", classElm))
+					writeMethod(classElm.getAttribute("fullname"), methodElm, writer);
+			}
 
-						first = true;
-						for (Element paramElm : XPathHelper.findElements("param", methodElm)) {
-							if (!first)
-								writer.write(", ");
-	
-							writer.write(paramElm.getAttribute("name").replaceAll("[.]", ""));
-							first = false;
-						}
-	
-						writer.write(") {\n");
+			// Output namespace members
+			writer.write("// Namespaces\n");
+			for (Element namespaceElm : XPathHelper.findElements("//namespace", this.doc)) {
+				String namespace = namespaceElm.getAttribute("fullname");
 
-						// Write summary
-						writer.write("\t/// <summary>" + methodElm.getAttribute("summary") + "</summary>\n");
+				// Write fields
+				for (Element propertyElm : XPathHelper.findElements("members/property|//class[@fullname='" + namespace + "']/members/property", namespaceElm))
+					writer.write(namespace + "." + propertyElm.getAttribute("name") + " = new " + propertyElm.getAttribute("type") + "();\n");
 
-						// Write parameters
-						for (Element paramElm : XPathHelper.findElements("param", methodElm))
-							writeParam(paramElm, writer);
+				// Write events as fields
+				for (Element eventElm : XPathHelper.findElements("members/event|//class[@fullname='" + namespace + "']/members/event", namespaceElm))
+					writer.write(namespace + "." + eventElm.getAttribute("name") + " = new tinymce.util.Dispatcher();\n");
 
-						// Write returns
-						writeReturn(XPathHelper.findElement("return", methodElm), writer);
-
-						writer.write("}\n\n");
-					}
-				}
+				// Write methods
+				for (Element methodElm : XPathHelper.findElements("members/method|//class[@fullname='" + namespace + "']/members/method", namespaceElm))
+					writeMethod(namespace, methodElm, writer);
 			}
 		} finally {
 			writer.close();
 		}
 	}
 
+	private void writeMethod(String prefix, Element method_elm, BufferedWriter writer) throws IOException, XPathExpressionException {
+		boolean first;
+
+		if (method_elm != null && !method_elm.hasAttribute("constructor")) {
+			if (!method_elm.hasAttribute("static"))
+				writer.write(prefix + ".prototype." + method_elm.getAttribute("name") + " = function(");
+			else
+				writer.write(prefix + "." + method_elm.getAttribute("name") + " = function(");
+
+			first = true;
+			for (Element paramElm : XPathHelper.findElements("param", method_elm)) {
+				if (!first)
+					writer.write(", ");
+
+				writer.write(paramElm.getAttribute("name").replaceAll("[.]", ""));
+				first = false;
+			}
+
+			writer.write(") {\n");
+
+			// Write summary
+			writer.write("\t/// <summary>" + method_elm.getAttribute("summary") + "</summary>\n");
+
+			// Write parameters
+			for (Element paramElm : XPathHelper.findElements("param", method_elm))
+				writeParam(paramElm, writer);
+
+			// Write returns
+			writeReturn(XPathHelper.findElement("return", method_elm), writer);
+
+			writer.write("}\n\n");
+		}
+	}
+	
 	private void writeParam(Element param_elm, BufferedWriter writer) throws IOException {
 		if (param_elm != null) {
 			writer.write("\t/// <param name=\"" + param_elm.getAttribute("name").replaceAll("[.]", "") + "\" type=\"" + param_elm.getAttribute("type") + "\"");
@@ -128,7 +153,7 @@ public class IntelliSenseGenerator {
 				writer.write(" integer=\"true\"");
 
 			// Write summary
-			writer.write(">" + param_elm.getTextContent().replaceAll("[\r\n]", " ") + "</param>\n");
+			writer.write(">" + trim(param_elm.getTextContent()) + "</param>\n");
 		}
 	}
 
@@ -145,7 +170,11 @@ public class IntelliSenseGenerator {
 				writer.write(" integer=\"true\"");
 
 			// Write summary
-			writer.write(">" + return_elm.getTextContent().replaceAll("[\r\n]", " ") + "</returns>\n");
+			writer.write(">" + trim(return_elm.getTextContent()) + "</returns>\n");
 		}
+	}
+
+	private String trim(String str) {
+		return str.replaceAll("[\r\n]", " ").trim();
 	}
 }
