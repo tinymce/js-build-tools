@@ -33,6 +33,7 @@ public class Processor {
 	private File outDir, msIntelliSenseFile;
 	private Document doc;
 	private File templateDir;
+	private String title, eventClass;
 
 	public Processor() {
 		this.files = new Vector<File>();
@@ -52,6 +53,14 @@ public class Processor {
 
 	public void setMsIntelliSenseFile(File intelli_file) {
 		this.msIntelliSenseFile = intelli_file;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setEventClass(String cls) {
+		this.eventClass = cls;
 	}
 
 	public void process() throws XPathExpressionException, IOException, ParserConfigurationException, TransformerException, TransformerConfigurationException {
@@ -195,7 +204,7 @@ public class Processor {
 		if (this.msIntelliSenseFile != null) {
 			IntelliSenseGenerator generator = new IntelliSenseGenerator(this.doc);
 
-			generator.generateToMsFormat(this.msIntelliSenseFile);
+			generator.generateToMsFormat(this.msIntelliSenseFile, this.eventClass);
 		}
 
 		// Generate HTML using XSLT
@@ -222,8 +231,6 @@ public class Processor {
 		}
 	}
 
-
-	
 	public int getProcessedFileCount() {
 		return this.processedFileCount;
 	}
@@ -266,6 +273,11 @@ public class Processor {
 		Transformer transformer = factory.newTransformer(new StreamSource(new File(this.templateDir, xslt)));
 
 		transformer.setParameter("target", target);
+		
+		if (this.title != null)
+			transformer.setParameter("title", this.title);
+		else
+			transformer.setParameter("title", "");
 
 		transformer.transform(new javax.xml.transform.dom.DOMSource(this.doc), new StreamResult(new FileOutputStream(new File(this.outDir, output))));
 	}

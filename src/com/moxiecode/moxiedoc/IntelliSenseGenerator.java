@@ -20,7 +20,7 @@ public class IntelliSenseGenerator {
 		this.doc = doc;
 	}
 
-	public void generateToMsFormat(File out_file) throws IOException, XPathExpressionException {
+	public void generateToMsFormat(File out_file, String event_class) throws IOException, XPathExpressionException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(out_file.getAbsolutePath()));
 
 		try {
@@ -73,8 +73,10 @@ public class IntelliSenseGenerator {
 				}
 
 				// Write events as fields
-				for (Element eventElm : XPathHelper.findElements("members/event", classElm)) {
-					writer.write("\t/// <field name=\"" + eventElm.getAttribute("name") + "\" type=\"tinymce.util.Dispatcher\">" + trim(eventElm.getTextContent()) + "</field>\n");
+				if (event_class != null) {
+					for (Element eventElm : XPathHelper.findElements("members/event", classElm)) {
+						writer.write("\t/// <field name=\"" + eventElm.getAttribute("name") + "\" type=\"" + event_class + "\">" + trim(eventElm.getTextContent()) + "</field>\n");
+					}
 				}
 
 				writer.write("}\n\n");
@@ -117,8 +119,10 @@ public class IntelliSenseGenerator {
 			}
 
 			// Write events as fields
-			for (Element eventElm : XPathHelper.findElements("model/members/event", this.doc))
-				writer.write(eventElm.getAttribute("name") + " = new tinymce.util.Dispatcher();\n");
+			if (event_class != null) {
+				for (Element eventElm : XPathHelper.findElements("model/members/event", this.doc))
+					writer.write(eventElm.getAttribute("name") + " = new " + event_class + "();\n");
+			}
 
 			// Write methods
 			for (Element methodElm : XPathHelper.findElements("model/members/method", this.doc))

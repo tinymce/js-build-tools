@@ -11,7 +11,7 @@ import org.apache.tools.ant.types.FileSet;
 import com.moxiecode.moxiedoc.Processor;
 
 public class MoxieDocTask extends Task {
-	protected String outDir, templateDir, msIntelliSense;
+	protected String outDir, templateDir, msIntelliSense, title, eventClass;
 	protected Vector<FileSet> filesets = new Vector<FileSet>();
 
 	public void addFileSet(FileSet fileset) {
@@ -32,6 +32,8 @@ public class MoxieDocTask extends Task {
 
 		processor.setOutDir(outDir);
 		processor.setTemplateDir(new File(this.templateDir));
+		processor.setTitle(this.title);
+		processor.setEventClass(this.eventClass);
 
 		if (this.msIntelliSense != null)
 			processor.setMsIntelliSenseFile(new File(this.msIntelliSense));
@@ -67,5 +69,13 @@ public class MoxieDocTask extends Task {
 
 	public void setMsIntelliSense(String path) {
 		this.msIntelliSense = path;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setEventClass(String event_class) {
+		this.eventClass = event_class;
 	}
 }
