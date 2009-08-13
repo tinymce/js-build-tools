@@ -386,6 +386,8 @@ public class Processor {
 				}
 			} else if (types != null && types.length == 1)
 				paramElm.setAttribute("type", types[0]);
+			else if (types == null)
+				paramElm.setAttribute("type", "Object");
 
 			// Add description
 			Element paramDescriptionElm = doc.createElement("description");
@@ -415,6 +417,8 @@ public class Processor {
 				}
 			} else if (types != null && types.length == 1)
 				returnElm.setAttribute("type", types[0]);
+			else if (types == null)
+				returnElm.setAttribute("type", "Object");
 
 			returnDescriptionElm.appendChild(doc.createTextNode(returnTag.getText()));
 			returnElm.appendChild(returnDescriptionElm);
@@ -477,6 +481,10 @@ public class Processor {
 		if (block.hasTag("property")) {
 			memberElm = doc.createElement("property");
 			memberElm.setAttribute("name", block.getTag("property").getText());
+
+			// If it doesn't have a type default to Object
+			if (!block.hasTag("type"))
+				memberElm.setAttribute("type", "Object");
 		}
 
 		if (memberElm != null)
