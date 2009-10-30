@@ -4,7 +4,7 @@
 <title>Reference unpacker</title>
 <script>
 function unpack(lookup, data) {
-	var key, time;
+	var key, time, uncompressed;
 
 	time = new Date().getTime();
 
@@ -19,12 +19,12 @@ function unpack(lookup, data) {
 		lookup[key] = replace(lookup[key]);
 
 	// Unpack data
-	data = replace(data);
+	uncompressed = replace(data);
 	time = new Date().getTime() - time;
 
 	// Log results
-	log('Unpacking took: ' + time + ' ms');
-	log('Data:\n' + data + '\n');
+	log('Unpacking took: ' + time + ' ms' + ' , ratio: ' + Math.round(100 - (data.length / uncompressed.length) * 100) + '%');
+	log('Data:\n' + uncompressed + '\n');
 }
 
 function log(str) {

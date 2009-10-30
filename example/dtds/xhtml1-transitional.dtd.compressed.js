@@ -27,12 +27,8 @@ unpack({
 	AC : 'p|Y|div|U|W|table|br|span|bdo|object|applet|img|map|K|N|Q',
 	AB : 'X|S|Q',
 	AA : 'a|G|J|M|O|P'
-}, 'html[B|id|xmlns][head|body]' + 
-	'head[B|id|profile][script|style|meta|link|object|isindex|title|script|style|meta|link|object|isindex|base|script|style|meta|link|object|isindex|base|script|style|meta|link|object|isindex|title|script|style|meta|link|object|isindex]' + 
-	'script[id|charset|type|language|src|defer|xml:space]' + 
+}, 'script[id|charset|type|language|src|defer|xml:space]' + 
 	'style[B|id|type|media|title|xml:space]' + 
-	'meta[B|id|http-equiv|name|content|scheme]' + 
-	'link[E|charset|href|hreflang|type|rel|rev|media|target]' + 
 	'object[E|declare|classid|codebase|data|type|codetype|archive|standby|height|width|usemap|name|tabindex|align|border|hspace|vspace][param|Y]' + 
 	'param[id|name|value|valuetype|type]' + 
 	'p[E|align][S]' + 
@@ -113,7 +109,5 @@ unpack({
 	'tfoot[E|align|char|charoff|valign][tr]' + 
 	'tbody[E|align|char|charoff|valign][tr]' + 
 	'area[E|D|shape|coords|href|nohref|alt|target]' + 
-	'title[B|id]' + 
-	'base[id|href|target]' + 
-	'body[E|onload|onunload|background|bgcolor|text|link|vlink|alink][Y]'
+	'base[id|href|target]'
 );

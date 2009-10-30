@@ -29,15 +29,14 @@
 		<!-- Compress the file using the YUI Compressor -->
 		<yuicompress infile="example.preprocessed.js" outfile="example.min.js" />
 
-		<!-- Converts dtds to JS files -->
-		<!-- <dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.js" /> -->
-
 		<!-- Process XHTML Strict DTD -->
-		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.compressed.js" propertiesFile="dtds/xhtml1-strict.dtd.properties" />
+		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.js" />
+		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.compressed.js" propertiesFile="dtds/xhtml1-strict.dtd.properties" exclude="html,head,body,meta,title,link" />
 		<yuicompress infile="dtds/xhtml1-strict.dtd.compressed.js" outfile="dtds/xhtml1-strict.dtd.compressed.min.js" />
 
 		<!-- Process XHTML Transitional DTD -->
-		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.compressed.js" propertiesFile="dtds/xhtml1-transitional.dtd.properties" />
+		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.js" />
+		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.compressed.js" propertiesFile="dtds/xhtml1-transitional.dtd.properties" exclude="html,head,body,meta,title,link" />
 		<yuicompress infile="dtds/xhtml1-transitional.dtd.compressed.js" outfile="dtds/xhtml1-transitional.dtd.compressed.min.js" />
 	</target>
 

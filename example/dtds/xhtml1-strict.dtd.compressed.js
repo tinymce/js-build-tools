@@ -26,12 +26,8 @@ unpack({
 	B : 'lang|xml:lang|dir',
 	A : 'id|class|style|title',
 	AA : 'align|char|charoff|valign'
-}, 'html[B|id|xmlns][head|body]' + 
-	'head[B|id|profile][script|style|meta|link|object|title|script|style|meta|link|object|base|script|style|meta|link|object|base|script|style|meta|link|object|title|script|style|meta|link|object]' + 
-	'script[id|charset|type|src|defer|xml:space]' + 
+}, 'script[id|charset|type|src|defer|xml:space]' + 
 	'style[B|id|type|media|title|xml:space]' + 
-	'meta[B|id|http-equiv|name|content|scheme]' + 
-	'link[E|charset|href|hreflang|type|rel|rev|media]' + 
 	'object[E|declare|classid|codebase|data|type|codetype|archive|standby|height|width|usemap|name|tabindex][param|R|form|a|F|object|img|H|I|J|L]' + 
 	'param[id|name|value|valuetype|type]' + 
 	'p[E][a|F|object|img|H|I|J|K]' + 
@@ -100,7 +96,5 @@ unpack({
 	'tfoot[E|AA][tr]' + 
 	'tbody[E|AA][tr]' + 
 	'area[E|D|shape|coords|href|nohref|alt]' + 
-	'title[B|id]' + 
-	'base[href|id]' + 
-	'body[E|onload|onunload][S]'
+	'base[href|id]'
 );

@@ -51,6 +51,7 @@ public class ValidElementsParser {
 	private static Hashtable elementList, attributeList, entityList;
 	private static DTDParser dtdParser;
 	private Vector<String> printedEleList;
+	private String[] excludes;
 	private FileOutputStream outputStrm = null;
 	private OutputStreamWriter osw = new OutputStreamWriter(System.out);
 	private OutputStreamWriter osw2;
@@ -60,16 +61,23 @@ public class ValidElementsParser {
 
 	/**
 	 * validElementsParser
+	 *
 	 * @param String dtdInputFile (the dtd to be processed)
 	 * @param String dtdOutputFile (where the data goes)
 	 * @param String dtdPropertiesFile (parsing instructions)
+	 * @param String exclude Comma separated list of elements to exclude.
 	 */
-	public ValidElementsParser(String dtdInputFile, String dtdOutputFile, String dtdPropertiesFile) throws FileNotFoundException,
+	public ValidElementsParser(String dtdInputFile, String dtdOutputFile, String dtdPropertiesFile, String exclude) throws FileNotFoundException,
 																										 DTDException,IOException {					
 		DTDFile testDTD = null;
 		testDTD = new DTDFile(dtdInputFile);
 		dtdParser = new DTDParser();
 		DocType newDoctype;
+
+		// Split excludes
+		if (exclude != null) {
+			this.excludes = exclude.split(",");
+		}
 
 		try {
 			outputStrm = new FileOutputStream(dtdOutputFile);
@@ -138,7 +146,19 @@ public class ValidElementsParser {
 	 * @throws DTDException
 	 */
 	private void printElements(String rootElement, String elders, int level) throws DTDException {
+		boolean exclude = false;
+
 		try {
+			// Exclude some elements
+			if (this.excludes != null) {
+				for (int i = 0; i < this.excludes.length; i++) {
+					if (this.excludes[i].equals(rootElement)) {
+						exclude = true;
+						break;
+					}
+				}
+			}
+
 			if (rootElement.equals("#PCDATA")) {
 				return;
 			}
@@ -172,28 +192,38 @@ public class ValidElementsParser {
 				return;
 			}
 
-			dataString += rootElement;
-			dataString += printAttributes(rootElement);
+			// Exlude element name and attribs
+			if (!exclude) {
+				dataString += rootElement;
+				dataString += printAttributes(rootElement);
+			}
+
 			printedEleList.addElement(rootElement);
 
 			// the remainder of the method prints any child elements.
 			if (root.hasChildren() == false) {
-				dataString += "\n";
+				if (!exclude)
+					dataString += "\n";
+
 				return;
 			}
 
 			String [] childNames = root.getChildrenNames();
 			int rep;
-			dataString += "[";
 
-			for (rep = 0; rep < childNames.length - 1; rep++) {
-				if (!childNames[rep].equals("#PCDATA")) {
-					dataString += childNames[rep]+"|";
+			// Exclude children
+			if (!exclude) {
+				dataString += "[";
+
+				for (rep = 0; rep < childNames.length - 1; rep++) {
+					if (!childNames[rep].equals("#PCDATA")) {
+						dataString += childNames[rep]+"|";
+					}
 				}
-			}
 
-			dataString += childNames[rep];
-			dataString += "]\n";
+				dataString += childNames[rep];
+				dataString += "]\n";
+			}
 
 			for (rep=0; rep <= childNames.length - 1; rep++) {
 				printElements(childNames[rep], elders, level + 1);	
