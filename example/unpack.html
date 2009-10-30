@@ -2,15 +2,14 @@
 <html>
 <head>
 <title>Reference unpacker</title>
+<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
 <script>
 function unpack(lookup, data) {
-	var key, time, uncompressed, lookupSize = 0;
+	var key, time, unpackTime, parseTime, uncompressed, lookupSize = 0, schema = {};
 
 	// Calc lookup size
 	for (key in lookup)
 		lookupSize += key.length + lookup[key].length;
-
-	time = new Date().getTime();
 
 	function replace(value) {
 		return value.replace(/[A-Z]+/g, function(key) {
@@ -18,17 +17,44 @@ function unpack(lookup, data) {
 		});
 	};
 
+	function makeMap(str) {
+		var items = str.split(/\|/), i, map = {};
+
+		for (i = 0; i < items.length; i++)
+			map[items[i]] = 1;
+
+		return map;
+	};
+
+	time = new Date().getTime();
+
 	// Unpack lookup
 	for (key in lookup)
 		lookup[key] = replace(lookup[key]);
 
 	// Unpack data
 	uncompressed = replace(data);
-	time = new Date().getTime() - time;
+	unpackTime = new Date().getTime() - time;
+
+	uncompressed.replace(/(\w+)\[([^\]]+)\]\[([^\]]+)\]/g, function(str, tag, attrs, children) {
+		schema[tag] = {
+			attribs : makeMap(attrs),
+			children : makeMap(children)
+		};
+	});
+
+	parseTime = new Date().getTime() - time;
 
 	// Log results
-	log('Unpacking took: ' + time + ' ms' + ' , ratio: ' + Math.round(100 - ((lookupSize + data.length) / uncompressed.length) * 100) + '%');
+	log('Unpacking took: ' + unpackTime + ' ms' + ', parsing took: ' +
+		parseTime + ' ms, Total: ' + (unpackTime + parseTime) +
+		' ms, ratio: ' +
+		Math.round(100 - ((lookupSize + data.length) / uncompressed.length) * 100) + '%'
+	);
+
 	log('Data: ' + uncompressed + '\n');
+
+	console.dir(schema);
 }
 
 function log(str) {
