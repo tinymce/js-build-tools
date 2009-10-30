@@ -13,6 +13,7 @@
 	<taskdef name="preprocess" classname="com.moxiecode.ant.tasks.PreProcessTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 	<taskdef name="yuicompress" classname="com.moxiecode.ant.tasks.YuiCompressTask" classpathref="js-build-tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 	<taskdef name="moxiedoc" classname="com.moxiecode.ant.tasks.MoxieDocTask" classpathref="tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
+	<taskdef name="dtd2js" classname="com.moxiecode.ant.tasks.Dtd2JsTask" classpathref="tasks.classpath" loaderref="js-build-tasks.classpath.loader" />
 
 	<!-- Setup default build target -->
 	<target name="build">
@@ -27,6 +28,17 @@
 
 		<!-- Compress the file using the YUI Compressor -->
 		<yuicompress infile="example.preprocessed.js" outfile="example.min.js" />
+
+		<!-- Converts dtds to JS files -->
+		<!-- <dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.js" /> -->
+
+		<!-- Process XHTML Strict DTD -->
+		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.compressed.js" propertiesFile="dtds/xhtml1-strict.dtd.properties" />
+		<yuicompress infile="dtds/xhtml1-strict.dtd.compressed.js" outfile="dtds/xhtml1-strict.dtd.compressed.min.js" />
+
+		<!-- Process XHTML Transitional DTD -->
+		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.compressed.js" propertiesFile="dtds/xhtml1-transitional.dtd.properties" />
+		<yuicompress infile="dtds/xhtml1-transitional.dtd.compressed.js" outfile="dtds/xhtml1-transitional.dtd.compressed.min.js" />
 	</target>
 
 	<!-- Generate JS documentation -->

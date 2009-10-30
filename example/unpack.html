@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+<title>Reference unpacker</title>
+<script>
+function unpack(lookup, data) {
+	var key, time;
+
+	time = new Date().getTime();
+
+	function replace(value) {
+		return value.replace(/[A-Z]+/g, function(key) {
+			return replace(lookup[key]);
+		});
+	};
+
+	// Unpack lookup
+	for (key in lookup)
+		lookup[key] = replace(lookup[key]);
+
+	// Unpack data
+	data = replace(data);
+	time = new Date().getTime() - time;
+
+	// Log results
+	log('Unpacking took: ' + time + ' ms');
+	log('Data:\n' + data + '\n');
+}
+
+function log(str) {
+	document.getElementById('output').appendChild(document.createTextNode(str + "\n"));
+}
+</script>
+</head>
+<body>
+<pre id="output">
+</pre>
+<script src="dtds/xhtml1-strict.dtd.compressed.min.js"></script>
+<script src="dtds/xhtml1-transitional.dtd.compressed.min.js"></script>
+</body>
+</html>
