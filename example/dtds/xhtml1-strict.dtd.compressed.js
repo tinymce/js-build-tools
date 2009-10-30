@@ -1,12 +1,15 @@
 unpack({
-	Z : 'a|F|Y|J|K',
+	Z : 'a|F|object|img|H|I|J|K',
 	Y : 'object|img|H|em|strong|dfn|code|q|samp|kbd|var|cite|abbr|acronym|sub|sup',
 	X : 'p|O|div|P|Q|table|G|H|I|L',
 	W : 'a|H|I|F|K|J',
 	V : 'R|L',
 	U : 'G|H|I|J|K',
+	ZC : '[E][Z]',
 	T : 'R|form|N|L',
+	ZB : 'align|char|charoff|valign',
 	S : 'R|form|L',
+	ZA : 'R|form|a|F|object|img|H|I|J|L',
 	R : 'p|O|div|P|Q|fieldset|table',
 	Q : 'pre|hr|blockquote|address',
 	P : 'ul|ol|dl',
@@ -24,77 +27,76 @@ unpack({
 	D : 'accesskey|tabindex|onfocus|onblur',
 	C : 'onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup',
 	B : 'lang|xml:lang|dir',
-	A : 'id|class|style|title',
-	AA : 'align|char|charoff|valign'
+	A : 'id|class|style|title'
 }, 'script[id|charset|type|src|defer|xml:space]' + 
 	'style[B|id|type|media|title|xml:space]' + 
-	'object[E|declare|classid|codebase|data|type|codetype|archive|standby|height|width|usemap|name|tabindex][param|R|form|a|F|object|img|H|I|J|L]' + 
+	'object[E|declare|classid|codebase|data|type|codetype|archive|standby|height|width|usemap|name|tabindex][param|ZA]' + 
 	'param[id|name|value|valuetype|type]' + 
-	'p[E][a|F|object|img|H|I|J|K]' + 
+	'pZC' + 
 	'a[E|D|charset|type|name|href|hreflang|rel|rev|shape|coords][F|object|img|H|I|J|K]' + 
 	'br[A]' + 
-	'span[E][a|F|object|img|H|I|J|K]' + 
-	'bdo[A|C|B][a|F|object|img|H|I|J|K]' + 
+	'spanZC' + 
+	'bdo[A|C|B][Z]' + 
 	'map[B|C|A|name][S|area]' + 
-	'h1[E][a|F|object|img|H|I|J|K]' + 
+	'h1ZC' + 
 	'img[E|src|alt|longdesc|height|width|usemap|ismap]' + 
-	'tt[E][a|F|object|img|H|I|J|K]' + 
-	'i[E][a|F|object|img|H|I|J|K]' + 
-	'b[E][a|F|object|img|H|I|J|K]' + 
-	'big[E][a|F|object|img|H|I|J|K]' + 
-	'small[E][a|F|object|img|H|I|J|K]' + 
-	'em[E][a|F|object|img|H|I|J|K]' + 
-	'strong[E][a|F|object|img|H|I|J|K]' + 
-	'dfn[E][a|F|object|img|H|I|J|K]' + 
-	'code[E][a|F|object|img|H|I|J|K]' + 
-	'q[E|cite][a|F|object|img|H|I|J|K]' + 
-	'samp[E][a|F|object|img|H|I|J|K]' + 
-	'kbd[E][a|F|object|img|H|I|J|K]' + 
-	'var[E][a|F|object|img|H|I|J|K]' + 
-	'cite[E][a|F|object|img|H|I|J|K]' + 
-	'abbr[E][a|F|object|img|H|I|J|K]' + 
-	'acronym[E][a|F|object|img|H|I|J|K]' + 
-	'sub[E][a|F|object|img|H|I|J|K]' + 
-	'sup[E][a|F|object|img|H|I|J|K]' + 
+	'ttZC' + 
+	'iZC' + 
+	'bZC' + 
+	'bigZC' + 
+	'smallZC' + 
+	'emZC' + 
+	'strongZC' + 
+	'dfnZC' + 
+	'codeZC' + 
+	'q[E|cite][Z]' + 
+	'sampZC' + 
+	'kbdZC' + 
+	'varZC' + 
+	'citeZC' + 
+	'abbrZC' + 
+	'acronymZC' + 
+	'subZC' + 
+	'supZC' + 
 	'input[E|D|type|name|value|checked|disabled|readonly|size|maxlength|src|alt|usemap|onselect|onchange|accept]' + 
 	'select[E|name|size|multiple|disabled|tabindex|onfocus|onblur|onchange][optgroup|option]' + 
 	'optgroup[E|disabled|label][option]' + 
 	'option[E|selected|disabled|label|value]' + 
 	'textarea[E|D|name|rows|cols|disabled|readonly|onselect|onchange]' + 
-	'label[E|for|accesskey|onfocus|onblur][a|F|object|img|H|I|J|K]' + 
+	'label[E|for|accesskey|onfocus|onblur][Z]' + 
 	'button[E|D|name|value|type|disabled][p|O|div|P|Q|table|F|object|img|H|I|L]' + 
-	'h2[E][a|F|object|img|H|I|J|K]' + 
-	'ins[E|cite|datetime][R|form|a|F|object|img|H|I|J|L]' + 
-	'h3[E][a|F|object|img|H|I|J|K]' + 
-	'del[E|cite|datetime][R|form|a|F|object|img|H|I|J|L]' + 
-	'h4[E][a|F|object|img|H|I|J|K]' + 
-	'h5[E][a|F|object|img|H|I|J|K]' + 
-	'h6[E][a|F|object|img|H|I|J|K]' + 
-	'div[E][R|form|a|F|object|img|H|I|J|L]' + 
+	'h2ZC' + 
+	'ins[E|cite|datetime][ZA]' + 
+	'h3ZC' + 
+	'del[E|cite|datetime][ZA]' + 
+	'h4ZC' + 
+	'h5ZC' + 
+	'h6ZC' + 
+	'div[E][ZA]' + 
 	'ul[E][li]' + 
-	'li[E][R|form|a|F|object|img|H|I|J|L]' + 
+	'li[E][ZA]' + 
 	'ol[E][li]' + 
 	'dl[E][dt|dd]' + 
-	'dt[E][a|F|object|img|H|I|J|K]' + 
-	'dd[E][R|form|a|F|object|img|H|I|J|L]' + 
+	'dtZC' + 
+	'dd[E][ZA]' + 
 	'pre[E|xml:space][W]' + 
 	'hr[E]' + 
 	'blockquote[E|cite][S]' + 
-	'address[E][a|F|object|img|H|I|J|K]' + 
-	'fieldset[E][legend|R|form|a|F|object|img|H|I|J|L]' + 
-	'legend[E|accesskey][a|F|object|img|H|I|J|K]' + 
+	'addressZC' + 
+	'fieldset[E][legend|ZA]' + 
+	'legend[E|accesskey][Z]' + 
 	'table[E|summary|width|border|frame|rules|cellspacing|cellpadding][caption|col|colgroup|thead|tfoot|tbody|tr]' + 
-	'caption[E][a|F|object|img|H|I|J|K]' + 
-	'col[E|span|width|AA]' + 
-	'colgroup[E|span|width|AA][col]' + 
-	'thead[E|AA][tr]' + 
-	'tr[E|AA][th|td]' + 
-	'th[E|abbr|axis|headers|scope|rowspan|colspan|AA][R|form|a|F|object|img|H|I|J|L]' + 
+	'captionZC' + 
+	'col[E|span|width|ZB]' + 
+	'colgroup[E|span|width|ZB][col]' + 
+	'thead[E|ZB][tr]' + 
+	'tr[E|ZB][th|td]' + 
+	'th[E|abbr|axis|headers|scope|rowspan|colspan|ZB][ZA]' + 
 	'form[E|action|method|enctype|onsubmit|onreset|accept|accept-charset][V]' + 
 	'noscript[E][S]' + 
-	'td[E|abbr|axis|headers|scope|rowspan|colspan|AA][R|form|a|F|object|img|H|I|J|L]' + 
-	'tfoot[E|AA][tr]' + 
-	'tbody[E|AA][tr]' + 
+	'td[E|abbr|axis|headers|scope|rowspan|colspan|ZB][ZA]' + 
+	'tfoot[E|ZB][tr]' + 
+	'tbody[E|ZB][tr]' + 
 	'area[E|D|shape|coords|href|nohref|alt]' + 
 	'base[href|id]'
 );
