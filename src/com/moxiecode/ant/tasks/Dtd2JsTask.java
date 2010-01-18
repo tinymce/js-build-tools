@@ -8,13 +8,14 @@ import com.moxiecode.dtd2js.ValidElementsParser;
 
 public class Dtd2JsTask extends Task {
 	protected String charset = "ISO-8859-1", inFile, outFile, propertiesFile, exclude;
+	protected boolean attributes = true;
 
 	public void execute() throws BuildException {
 		if (this.inFile == null || this.outFile == null)
 			throw new BuildException("Missing required: infile, outfile file parameter(s).");
 
 		try {
-			ValidElementsParser vep = new ValidElementsParser(inFile, outFile, propertiesFile, exclude);
+			ValidElementsParser vep = new ValidElementsParser(inFile, outFile, propertiesFile, exclude, attributes);
 
 			vep.printValidElements();
 		} catch (DTDException ex) {
@@ -42,5 +43,9 @@ public class Dtd2JsTask extends Task {
 
 	public void setPropertiesFile(String propertiesFile) {
 		this.propertiesFile = propertiesFile;
+	}
+
+	public void setAttributes(boolean attrs) {
+		this.attributes = attrs;
 	}
 }

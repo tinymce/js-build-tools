@@ -58,6 +58,7 @@ public class ValidElementsParser {
 	private BufferedWriter outputDevice;
 	private String dataString = "";
 	private Properties parseProperties;
+	private boolean includeAttributes;
 
 	/**
 	 * validElementsParser
@@ -67,7 +68,7 @@ public class ValidElementsParser {
 	 * @param String dtdPropertiesFile (parsing instructions)
 	 * @param String exclude Comma separated list of elements to exclude.
 	 */
-	public ValidElementsParser(String dtdInputFile, String dtdOutputFile, String dtdPropertiesFile, String exclude) throws FileNotFoundException,
+	public ValidElementsParser(String dtdInputFile, String dtdOutputFile, String dtdPropertiesFile, String exclude, boolean include_attributes) throws FileNotFoundException,
 																										 DTDException,IOException {					
 		DTDFile testDTD = null;
 		testDTD = new DTDFile(dtdInputFile);
@@ -78,6 +79,8 @@ public class ValidElementsParser {
 		if (exclude != null) {
 			this.excludes = exclude.split(",");
 		}
+
+		this.includeAttributes = include_attributes;
 
 		try {
 			outputStrm = new FileOutputStream(dtdOutputFile);
@@ -195,7 +198,9 @@ public class ValidElementsParser {
 			// Exlude element name and attribs
 			if (!exclude) {
 				dataString += rootElement;
-				dataString += printAttributes(rootElement);
+
+				if (this.includeAttributes)
+					dataString += printAttributes(rootElement);
 			}
 
 			printedEleList.addElement(rootElement);
@@ -203,7 +208,7 @@ public class ValidElementsParser {
 			// the remainder of the method prints any child elements.
 			if (root.hasChildren() == false) {
 				if (!exclude)
-					dataString += "\n";
+					dataString += "[]\n";
 
 				return;
 			}
@@ -217,8 +222,9 @@ public class ValidElementsParser {
 
 				for (rep = 0; rep < childNames.length - 1; rep++) {
 					if (!childNames[rep].equals("#PCDATA")) {
-						dataString += childNames[rep]+"|";
-					}
+						dataString += childNames[rep] + "|";
+					} else
+						dataString += "#|";
 				}
 
 				dataString += childNames[rep];

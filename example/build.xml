@@ -31,13 +31,26 @@
 
 		<!-- Process XHTML Strict DTD -->
 		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.js" />
-		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.compressed.js" propertiesFile="dtds/xhtml1-strict.dtd.properties" exclude="html,head,body,meta,title,link" />
+		<dtd2js infile="dtds/xhtml1-strict.dtd" outFile="dtds/xhtml1-strict.dtd.compressed.js" propertiesFile="dtds/xhtml1-strict.dtd.properties" exclude="html,head,meta,title,link" />
 		<yuicompress infile="dtds/xhtml1-strict.dtd.compressed.js" outfile="dtds/xhtml1-strict.dtd.compressed.min.js" />
 
 		<!-- Process XHTML Transitional DTD -->
 		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.js" />
-		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.compressed.js" propertiesFile="dtds/xhtml1-transitional.dtd.properties" exclude="html,head,body,meta,title,link" />
+		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.compressed.js" propertiesFile="dtds/xhtml1-transitional.dtd.properties" exclude="html,head,meta,title,link" />
 		<yuicompress infile="dtds/xhtml1-transitional.dtd.compressed.js" outfile="dtds/xhtml1-transitional.dtd.compressed.min.js" />
+
+		<!-- Process XHTML Transitional DTD only children -->
+		<dtd2js infile="dtds/xhtml1-transitional.dtd" outFile="dtds/xhtml1-transitional.dtd.children.js" attributes="false" />
+
+		<dtd2js
+			infile="dtds/xhtml1-transitional.dtd"
+			outFile="dtds/xhtml1-transitional.dtd.children.compressed.js"
+			propertiesFile="dtds/xhtml1-transitional.dtd.children.properties"
+			attributes="false"
+			exclude="html,head,meta,title,link"
+		/>
+
+		<yuicompress infile="dtds/xhtml1-transitional.dtd.children.compressed.js" outfile="dtds/xhtml1-transitional.dtd.children.compressed.min.js" />
 	</target>
 
 	<!-- Generate JS documentation -->

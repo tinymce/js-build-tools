@@ -333,12 +333,15 @@ public class Processor {
 		Element targetElm = makeNameSpace(className, true);
 
 		// Add class to namespace
-		Element classElm = this.doc.createElement("class");
+		Element classElm = XPathHelper.findElement("//class[@fullname='" + className + "']", this.doc);
+		if (classElm == null) {
+			classElm = this.doc.createElement("class");
 
-		classElm.setAttribute("name", getShortName(className));
-		classElm.setAttribute("fullname", className);
+			classElm.setAttribute("name", getShortName(className));
+			classElm.setAttribute("fullname", className);
 
-		targetElm.appendChild(classElm);
+			targetElm.appendChild(classElm);
+		}
 
 		addTags(block, classElm);
 
