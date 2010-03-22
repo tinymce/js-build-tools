@@ -49,7 +49,6 @@
 
 		<!-- Build jar, and copy to lib -->
 		<jar jarfile="${project.build.dir}/${project.jar.prefix}.jar" basedir="${project.build.dir}/classes" compress="true" index="true" />
-		<copy file="${project.build.dir}/${project.jar.prefix}.jar" tofile="lib/${project.jar.prefix}.jar" overwrite="true"/>
     </target>
 
     <target name="release" depends="" description="Builds a release package">
