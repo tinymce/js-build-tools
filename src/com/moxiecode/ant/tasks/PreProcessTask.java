@@ -29,8 +29,7 @@ public class PreProcessTask extends Task {
 			in = new BufferedReader(new InputStreamReader(in_stream));
 			out = new BufferedWriter(new OutputStreamWriter(out_stream));
 
-			Pattern pattern = Pattern.compile("^\\s*\\/\\/\\s*#(ifdef|ifndef|endif)\\s*(\\w*)$");
-
+			Pattern pattern = Pattern.compile("^\\s*[<!--|\\/\\/|\\/\\*]*\\s*#(ifdef|ifndef|endif)\\s*(\\w*)\\s*[-->|\\/\\/|\\*\\/]*$");
 			while ((line = in.readLine()) != null) {
 				Matcher matcher = pattern.matcher(line);
 
