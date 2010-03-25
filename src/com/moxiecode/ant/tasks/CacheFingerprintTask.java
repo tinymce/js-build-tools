@@ -80,7 +80,7 @@ public class CacheFingerprintTask extends Task {
 	}
 	
 	public void setProcessIMG(boolean _fingerprintIMG){
-		this.fingerprintIMG = _fingerprintIMG;
+		this.processIMG = _fingerprintIMG;
 	}
 
 	public void setProcessCSS(boolean _processCSS){
