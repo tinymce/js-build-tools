@@ -68,7 +68,6 @@ public class CacheFingerprintTask extends Task {
 	private boolean processIMG = true;
 	private boolean processCSS = true;
 	private String staticServers[] = null;	
-	private int serverCount = 0;
 	
 	public void setBuildPath(String _buildPath) {
 		this.buildPath = _buildPath;
@@ -79,7 +78,7 @@ public class CacheFingerprintTask extends Task {
 	}
 	
 	public void setProcessIMG(boolean _fingerprintIMG){
-		this.fingerprintIMG = _fingerprintIMG;
+		this.processIMG = _fingerprintIMG;
 	}
 
 	public void setProcessCSS(boolean _processCSS){
@@ -167,8 +166,9 @@ public class CacheFingerprintTask extends Task {
 			String refFilename = buildPath + res.group(1);
 			File refFile = new File(refFilename);
 			if(refFile.exists()){
-				String withFingerprint =  res.group(1)+"?" + getChecksum(refFile);
-				if(_addServer) withFingerprint = addServer(withFingerprint);
+				String checksum = getChecksum(refFile);
+				String withFingerprint =  res.group(1)+"?" + checksum;
+				if(_addServer) withFingerprint = addServer(withFingerprint, Long.parseLong(checksum));
 				_line = _line.replaceFirst(res.group(1), withFingerprint);
 				log("Added fingerprint: " + withFingerprint);
 			}
@@ -179,11 +179,9 @@ public class CacheFingerprintTask extends Task {
 		return _line;
 	}
 	
-	private String addServer(String _path)  {
+	private String addServer(String _path, long _checksum)  {
 		if(staticServers != null){
-			String currentServer = staticServers[serverCount%staticServers.length];
-			log("Server: " + currentServer);
-			serverCount++;
+			String currentServer = staticServers[(int)(_checksum%(long)staticServers.length)];
 			_path = "http://" + currentServer + _path;
 		}
 		return _path;
