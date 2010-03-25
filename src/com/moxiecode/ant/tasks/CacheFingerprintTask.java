@@ -67,6 +67,7 @@ public class CacheFingerprintTask extends Task {
 	private boolean processJS = true;
 	private boolean processIMG = true;
 	private boolean processCSS = true;
+	private boolean fingerprintIMG = true;
 	private String staticServers[] = null;	
 	private int serverCount = 0;
 	
