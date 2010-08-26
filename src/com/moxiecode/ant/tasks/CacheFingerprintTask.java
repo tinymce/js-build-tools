@@ -39,6 +39,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
+import static org.apache.tools.ant.Project.MSG_ERR;
+import static org.apache.tools.ant.Project.MSG_VERBOSE;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,6 +69,7 @@ public class CacheFingerprintTask extends Task {
 	private boolean processJS = true;
 	private boolean processIMG = true;
 	private boolean processCSS = true;
+	private boolean fingerprintIMG = true;
 	private String staticServers[] = null;	
 	
 	public void setBuildPath(String _buildPath) {
@@ -118,13 +121,13 @@ public class CacheFingerprintTask extends Task {
 					String srcFilename = includedFiles[i].replace('\\', '/');
 					srcFilename = srcFilename.substring(srcFilename.lastIndexOf("/") + 1);
 					srcFile = new File(ds.getBasedir(), includedFiles[i]);
-                    log("Scanning " + srcFilename);
+                    log("Scanning " + srcFilename, MSG_VERBOSE);
 					srcInputStream = new FileInputStream(srcFile);
 					srcFileBuffer = new BufferedReader(new InputStreamReader(srcInputStream));
 					
-					Pattern jsPattern = Pattern.compile("^\\s*<(?i:script)\\s+.*\\s+(?i:src)\\s*=\\s*\"([^\"]*)\".*$");
-					Pattern imgPattern = Pattern.compile("^\\s*<(?i:img)\\s+.*\\s+(?i:src)\\s*=\\s*\"([^\"]*)\".*$");
-					Pattern cssPattern = Pattern.compile("^\\s*<(?i:link)\\s+.*\\s+(?i:href)\\s*=\\s*\"([^\"]*)\".*$");
+					Pattern jsPattern = Pattern.compile("^\\s*<(?i:script)\\s+.*(?i:src)\\s*=\\s*\"([^\"]*)\".*$");
+					Pattern imgPattern = Pattern.compile("^\\s*<(?i:img)\\s+.*(?i:src)\\s*=\\s*\"([^\"]*)\".*$");
+					Pattern cssPattern = Pattern.compile("^\\s*<(?i:link)\\s+.*(?i:href)\\s*=\\s*\"([^\"]*)\".*$");
 					
 					// Read src file (by lines)
 					while ((line = srcFileBuffer.readLine()) != null) {
@@ -170,10 +173,10 @@ public class CacheFingerprintTask extends Task {
 				String withFingerprint =  res.group(1)+"?" + checksum;
 				if(_addServer) withFingerprint = addServer(withFingerprint, Long.parseLong(checksum));
 				_line = _line.replaceFirst(res.group(1), withFingerprint);
-				log("Added fingerprint: " + withFingerprint);
+				log("Added fingerprint: " + withFingerprint, MSG_VERBOSE);
 			}
 			else {
-				log("Referenced file not found : " + refFilename);
+				log("Referenced file not found : " + refFilename, MSG_ERR);
 			}
 		}
 		return _line;

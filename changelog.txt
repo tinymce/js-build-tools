@@ -1,2 +1,5 @@
+Version 1.0.1 (2010-xx-xx)
+	Added new CacheFingerprintTask. Contributed by Juan Ignacio Donoso/Agustin Feuerhake.
+	Improved the PreProcess task to handle HTML/PHP etc. Patch contributed by Juan Ignacio Donoso/Agustin Feuerhake.
 Version 1.0 (2009-08-19)
 	First release.
