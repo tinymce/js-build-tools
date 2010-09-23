@@ -39,8 +39,9 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
-import static org.apache.tools.ant.Project.MSG_ERR;
 import static org.apache.tools.ant.Project.MSG_VERBOSE;
+import static org.apache.tools.ant.Project.MSG_WARN;
+import static org.apache.tools.ant.Project.MSG_INFO;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,6 +72,7 @@ public class CacheFingerprintTask extends Task {
 	private boolean processCSS = true;
 	private boolean fingerprintIMG = true;
 	private String staticServers[] = null;	
+	private int stats[] = {0,0,0,0};	
 	
 	public void setBuildPath(String _buildPath) {
 		this.buildPath = _buildPath;
@@ -119,9 +121,9 @@ public class CacheFingerprintTask extends Task {
 					//Open src file
 					ArrayList<String> tempFile = new ArrayList<String>(200);
 					String srcFilename = includedFiles[i].replace('\\', '/');
+                    log("Scanning " + srcFilename, MSG_INFO);
 					srcFilename = srcFilename.substring(srcFilename.lastIndexOf("/") + 1);
 					srcFile = new File(ds.getBasedir(), includedFiles[i]);
-                    log("Scanning " + srcFilename, MSG_VERBOSE);
 					srcInputStream = new FileInputStream(srcFile);
 					srcFileBuffer = new BufferedReader(new InputStreamReader(srcInputStream));
 					
@@ -152,13 +154,16 @@ public class CacheFingerprintTask extends Task {
 					
 					// Close destination file
 					destFileBuffer.close();
-						
-						
-                } catch (Exception e) {
+					
+				} catch (Exception e) {
                     e.printStackTrace();
                 }
+				stats[3]++;
             }
         }
+		
+		// Show some stats
+		log("FINISHED: Fingerprint: " + stats[0] + ", URLs: " + stats[1] + ", Not found: " + stats[2] + ", TOTAL FILES SCANNED: " + stats[3], MSG_INFO);
 
     }
 	
@@ -166,17 +171,28 @@ public class CacheFingerprintTask extends Task {
 		Matcher matcher = _pattern.matcher(_line);
 		if (matcher.matches()) {
 			MatchResult res = matcher.toMatchResult();
-			String refFilename = buildPath + res.group(1);
-			File refFile = new File(refFilename);
-			if(refFile.exists()){
-				String checksum = getChecksum(refFile);
-				String withFingerprint =  res.group(1)+"?" + checksum;
-				if(_addServer) withFingerprint = addServer(withFingerprint, Long.parseLong(checksum));
-				_line = _line.replaceFirst(res.group(1), withFingerprint);
-				log("Added fingerprint: " + withFingerprint, MSG_VERBOSE);
+			// Check whether the reference is a url
+			Pattern urlPat = Pattern.compile("https?:\\/\\/([-\\w\\.]+)+(:\\d+)?(\\/([\\w\\/_\\.]*(\\?\\S+)?)?)?");
+			Matcher ulrmatcher = urlPat.matcher(res.group(1));
+			if(!ulrmatcher.find()){
+				String refFilename = buildPath + res.group(1);
+				File refFile = new File(refFilename);
+				if(refFile.exists()){
+					String checksum = getChecksum(refFile);
+					String withFingerprint =  res.group(1)+"?" + checksum;
+					if(_addServer) withFingerprint = addServer(withFingerprint, Long.parseLong(checksum));
+					_line = _line.replaceFirst(res.group(1), withFingerprint);
+					stats[0]++;
+					log("  Added fingerprint " + withFingerprint, MSG_INFO);
+				}
+				else {
+					stats[2]++;
+					log("  Referenced file not found " + refFilename, MSG_WARN);
+				}
 			}
 			else {
-				log("Referenced file not found : " + refFilename, MSG_ERR);
+				stats[1]++;
+				log("  Referenced is a url " + res.group(1), MSG_INFO);
 			}
 		}
 		return _line;
