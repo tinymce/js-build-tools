@@ -14,20 +14,51 @@ or may not be feasible, depending on how your pages are coded.
 
 What this task does:
  This ant task goes through a fileset, through each line of each file, looking for things like:
- <script type ="text/javascript" src= "/scripts/script.js"/>,
- <img alt = "whatever" src="/images/img.gif"></img>
- or
- <link href="style.css"/>
+ 1) Script references
+	<script type ="text/javascript" src= "/scripts/script.js"/>
+ 2) Image references
+	<img alt="whatever" src="/images/img.gif"></img>
+ 3)	Link references
+	<link href="style.css"/>
+ 4)	CSS background images 
+	background-image:url(/images/test.jpg);
+	
+ The task get a checksum value for the file and use it to create a new reference:
  
- and rewrites them like this
+ By default it create a reference with a the checksum value as a query string:
+	/images/test.jpg?5454385464
+	/javascript/script.js?4654684864
  
- <script type ="text/javascript" src= "/scripts/script.js?83784828"/>,
- <img alt = "whatever" src="/images/img.gif?88273627"></img>
- or
- <link href="style.css?8954739"/>
- 
- where the number after ? is the checksum of the corresponding file.
  This solves the caching problem by letting the browser know when a file has changed by changing the url.
+ 
+ Paramenters:
+ 1) processjs (default value: true)
+	It will search for <script type ="text/javascript" src= "/scripts/script.js"/> like references
+	
+ 2) processimg (default value: true)
+	It will search for <img alt="whatever" src="/images/img.gif"></img> like references
+	
+ 3) processcss (default value: true)
+	It will search for <link href="style.css"/> like references
+	
+ 4) processcss (default value: true)
+	It will search for background-image:url(/images/test.jpg); like references
+	
+ 5) uri (default value: false)
+	for better caching throght proxies you can use the uri="true" paramenter this way the fingerprint is going to be added
+	to the begining of the uri. Something like this:
+		/a/5454385464/images/test.jpg
+		/a/4654684864/javascript/script.js
+		
+	Note: this will work only if yo create a rewrite rule on your server. 
+		
+ 6) staticservers
+	It prepends to the url a host. It receives a comma separated list of hosts to prepend and it choose one randomly for each referenced file.
+	Example:    staticservers="static1.yourhost.com,static2.yourhost.com"
+	Return:
+		http://static1.yourhost.com/images/test.jpg?5454385464
+		http://static2.yourhost.com/javascript/script.js?4654684864
+	
  
 This code was written by Juan Ignacio Donoso: juan.ignacio@voxound.com & Agustin Feuerhake: agustin@voxound.com
 based on other Tasks included in moxiecode js-build-tools, and has an MIT license.
@@ -70,7 +101,8 @@ public class CacheFingerprintTask extends Task {
 	private boolean processJS = true;
 	private boolean processIMG = true;
 	private boolean processCSS = true;
-	private boolean fingerprintIMG = true;
+	private boolean processCSSImages = true;
+	private boolean uri = false;
 	private String staticServers[] = null;	
 	private int stats[] = {0,0,0,0};	
 	
@@ -82,12 +114,20 @@ public class CacheFingerprintTask extends Task {
 		this.processJS = _processJS;
 	}
 	
-	public void setProcessIMG(boolean _fingerprintIMG){
-		this.processIMG = _fingerprintIMG;
+	public void setProcessIMG(boolean _processIMG){
+		this.processIMG = _processIMG;
 	}
 
 	public void setProcessCSS(boolean _processCSS){
 		this.processCSS = _processCSS;
+	}
+	
+	public void setProcessCSSImages(boolean _processCSSImages){
+		this.processCSSImages = _processCSSImages;
+	}
+	
+	public void setUri(boolean _uri){
+		this.uri = _uri;
 	}
 	
 	public void setStaticServers(String _serverNames){
@@ -130,12 +170,14 @@ public class CacheFingerprintTask extends Task {
 					Pattern jsPattern = Pattern.compile("^\\s*<(?i:script)\\s+.*(?i:src)\\s*=\\s*\"([^\"]*)\".*$");
 					Pattern imgPattern = Pattern.compile("^\\s*<(?i:img)\\s+.*(?i:src)\\s*=\\s*\"([^\"]*)\".*$");
 					Pattern cssPattern = Pattern.compile("^\\s*<(?i:link)\\s+.*(?i:href)\\s*=\\s*\"([^\"]*)\".*$");
+					Pattern cssImagesPattern = Pattern.compile("^.*background(?:-image)?[ ]*:.*url\\(['\"]?([^'\"]*)['\"]?\\);?.*$");
 					
 					// Read src file (by lines)
 					while ((line = srcFileBuffer.readLine()) != null) {
 						if(processJS) line = addFingerprint(jsPattern, line, true);
 						if(processIMG) line = addFingerprint(imgPattern, line, true);
 						if(processCSS) line = addFingerprint(cssPattern, line, true);
+						if(processCSSImages) line = addFingerprint(cssImagesPattern, line, true);
 						tempFile.add(line);
 					}	
 					// Close src file
@@ -163,7 +205,7 @@ public class CacheFingerprintTask extends Task {
         }
 		
 		// Show some stats
-		log("FINISHED: Fingerprint: " + stats[0] + ", URLs: " + stats[1] + ", Not found: " + stats[2] + ", TOTAL FILES SCANNED: " + stats[3], MSG_INFO);
+		log("FINISHED: Fingerprint: " + stats[0] + ", External URLs: " + stats[1] + ", Not found: " + stats[2] + ", TOTAL FILES SCANNED: " + stats[3], MSG_INFO);
 
     }
 	
@@ -179,7 +221,11 @@ public class CacheFingerprintTask extends Task {
 				File refFile = new File(refFilename);
 				if(refFile.exists()){
 					String checksum = getChecksum(refFile);
-					String withFingerprint =  res.group(1)+"?" + checksum;
+					String withFingerprint;
+					if(uri)
+						withFingerprint = "/a/" + checksum + res.group(1);
+					else
+						withFingerprint =  res.group(1)+"?" + checksum;
 					if(_addServer) withFingerprint = addServer(withFingerprint, Long.parseLong(checksum));
 					_line = _line.replaceFirst(res.group(1), withFingerprint);
 					stats[0]++;
