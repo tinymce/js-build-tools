@@ -61,7 +61,7 @@
 	<target name="moxiedoc" depends="" description="Generates HTML documentation out of js source">
 		<moxiedoc outdir="docs" msintellisense="docs\model.js" eventclass="tinymce.util.Dispatcher" templatedir="..\templates" title="Example API">
 			<fileset dir=".">
-				<include name="**/*.js" /> 
+				<include name="**/example1.js" /> 
 			</fileset>
 		</moxiedoc>
 	</target>

@@ -134,12 +134,12 @@ table.summary .deprecated {
 	margin: 0;
 }
 
-.params, .returns, .see {
+.options, .params, .returns, .see {
 	margin-left: 20px;
 	margin-bottom: 10px;
 }
 
-.params td.last {
+.options td.last, .params td.last {
 	padding-left: 10px;
 }
 

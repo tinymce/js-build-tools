@@ -382,6 +382,37 @@ public class Processor {
 
 		elm.setAttribute("summary", summary);
 
+		// Add options
+		for (OptionTag optionTag : block.getOptions()) {
+			Element optionElm = doc.createElement("option");
+
+			// Add name/type
+			optionElm.setAttribute("name", optionTag.getOptionName());
+
+			// Add types
+			String[] types = optionTag.getTypes();
+			if (types != null && types.length > 1) {
+				for (String type : types) {
+					Element typeElm = this.doc.createElement("type");
+
+					typeElm.setAttribute("fullname", type);
+
+					optionElm.appendChild(typeElm);
+				}
+			} else if (types != null && types.length == 1)
+				optionElm.setAttribute("type", types[0]);
+			else if (types == null)
+				optionElm.setAttribute("type", "Object");
+
+			// Add description
+			Element optionDescriptionElm = doc.createElement("description");
+			optionDescriptionElm.appendChild(doc.createTextNode(optionTag.getText()));
+			optionElm.appendChild(optionDescriptionElm);
+
+			// Append
+			elm.appendChild(optionElm);
+		}
+
 		// Add params
 		for (ParamTag paramTag : block.getParams()) {
 			Element paramElm = doc.createElement("param");
@@ -446,11 +477,12 @@ public class Processor {
 			Element exampleElm = doc.createElement("example");
 
 			// Add description
-			Element paramDescriptionElm = doc.createElement("example");
-			paramDescriptionElm.appendChild(doc.createTextNode(exampleTag.getText()));
-			exampleElm.appendChild(paramDescriptionElm);
+			/*Element paramDescriptionElm = doc.createElement("description");
+			exampleElm.appendChild(doc.createTextNode(exampleTag.getText()));
+			exampleElm.appendChild(paramDescriptionElm);*/
 
 			// Append
+			exampleElm.appendChild(doc.createTextNode(exampleTag.getText()));
 			elm.appendChild(exampleElm);
 		}
 
@@ -484,12 +516,6 @@ public class Processor {
 		if (block.hasTag("event")) {
 			memberElm = doc.createElement("event");
 			memberElm.setAttribute("name", block.getTag("event").getText());
-		}
-
-		// Is option
-		if (block.hasTag("option")) {
-			memberElm = doc.createElement("option");
-			memberElm.setAttribute("name", block.getTag("option").getText());
 		}
 
 		// Is property

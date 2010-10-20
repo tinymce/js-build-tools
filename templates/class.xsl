@@ -63,19 +63,48 @@
 					<xsl:for-each select="//class[@fullname=$target]/example">
 						<h4>Example</h4>
 						<pre class="brush: js;">
-							<xsl:value-of select="example/text()" disable-output-escaping="yes" />
+							<xsl:value-of select="text()" disable-output-escaping="yes" />
 						</pre>
 					</xsl:for-each>
 				</xsl:if>
 
-				<div class="summaryLists">
-					<!-- Option summary -->
-					<xsl:call-template name="member_summary_list">
-						<xsl:with-param	name="type">option</xsl:with-param>
-						<xsl:with-param	name="singular">Option</xsl:with-param>
-						<xsl:with-param	name="plural">Options</xsl:with-param>
-					</xsl:call-template>
+				<xsl:if test="//class[@fullname=$target]/option">
+					<h4>Options</h4>
 
+					<table class="options">
+						<xsl:for-each select="//class[@fullname=$target]/option">
+							<tr>
+								<td class="first">
+									<xsl:value-of select="@name" />
+									<xsl:text>:</xsl:text>
+
+									<xsl:choose>
+										<xsl:when test="@type">
+											<xsl:call-template name="type_name">
+												<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
+											</xsl:call-template>
+										</xsl:when>
+
+										<xsl:when test="type">
+											<xsl:for-each select="type">
+												<xsl:call-template name="type_name">
+													<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+												</xsl:call-template>
+
+												<xsl:if test="position() != last()">/</xsl:if>
+											</xsl:for-each>
+										</xsl:when>
+
+										<xsl:otherwise>Object</xsl:otherwise>
+									</xsl:choose>
+								</td>
+								<td class="last"><xsl:value-of select="description/text()" /></td>
+							</tr>
+						</xsl:for-each>
+					</table>
+				</xsl:if>
+
+				<div class="summaryLists">
 					<!-- Property summary -->
 					<xsl:call-template name="member_summary_list">
 						<xsl:with-param	name="type">property</xsl:with-param>
@@ -99,13 +128,6 @@
 				</div>
 
 				<div class="detailsList">
-					<!-- Option details -->
-					<xsl:call-template name="member_details_list">
-						<xsl:with-param	name="type">option</xsl:with-param>
-						<xsl:with-param	name="singular">Option</xsl:with-param>
-						<xsl:with-param	name="plural">Options</xsl:with-param>
-					</xsl:call-template>
-
 					<!-- Property details -->
 					<xsl:call-template name="member_details_list">
 						<xsl:with-param	name="type">property</xsl:with-param>
@@ -457,13 +479,6 @@
 						</xsl:if>
 					</xsl:when>
 
-					<xsl:when test="name() = 'option'">
-						option <xsl:value-of select="@name" /> : 
-						<xsl:call-template name="type_name">
-							<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
-						</xsl:call-template>
-					</xsl:when>
-
 					<xsl:when test="name() = 'event'">
 						event <xsl:value-of select="@name" /><xsl:call-template name="params" />
 					</xsl:when>
@@ -490,6 +505,43 @@
 				<div class="author">
 					<span>Author(s):</span> <xsl:value-of select="@author" />
 				</div>
+			</xsl:if>
+
+			<!-- Output options -->
+			<xsl:if test="option">
+				<h4>Options</h4>
+
+				<table class="options">
+					<xsl:for-each select="option">
+						<tr>
+							<td class="first">
+								<xsl:value-of select="@name" />
+								<xsl:text>:</xsl:text>
+
+								<xsl:choose>
+									<xsl:when test="@type">
+										<xsl:call-template name="type_name">
+											<xsl:with-param	name="type"><xsl:value-of select="@type" /></xsl:with-param>
+										</xsl:call-template>
+									</xsl:when>
+
+									<xsl:when test="type">
+										<xsl:for-each select="type">
+											<xsl:call-template name="type_name">
+												<xsl:with-param	name="type"><xsl:value-of select="@fullname" /></xsl:with-param>
+											</xsl:call-template>
+
+											<xsl:if test="position() != last()">/</xsl:if>
+										</xsl:for-each>
+									</xsl:when>
+
+									<xsl:otherwise>Object</xsl:otherwise>
+								</xsl:choose>
+							</td>
+							<td class="last"><xsl:value-of select="description/text()" /></td>
+						</tr>
+					</xsl:for-each>
+				</table>
 			</xsl:if>
 
 			<!-- Output parameters -->

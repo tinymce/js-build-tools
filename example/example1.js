@@ -2,12 +2,19 @@
 	/**
 	 * Here is some class.
 	 *
+	 * @version 1.0
+	 * @example
+	 * window.SomeClass.someFunc();
+	 * window.SomeClass.someOtherFunc();
 	 * @class SomeClass
+	 * @option {String} some_setting1 some value 1.
+	 * @option {Number} some_setting2 some value 2.
 	 */
 	window.SomeClass = function() {
 		/**
 		 * Some function.
 		 *
+		 * @version 1.1
 		 * @method someFunc
 		 * @param {String} arg1 First arg.
 		 * @param {String} arg2 Second arg.
@@ -20,9 +27,12 @@
 		/**
 		 * Some other function.
 		 *
+		 * @deprecated Removed in version 1.0
 		 * @method someOtherFunc
 		 * @param {String} arg1 First arg.
-		 * @param {String} arg2 Second arg.
+		 * @param {Object} arg2 Second arg.
+		 * @option {String} some_setting1 some value 1.
+		 * @option {Number} some_setting2 some value 2.
 		 * @return {String} Some string.
 		 */
 		this.someOtherFunc = function(arg1, arg2) {

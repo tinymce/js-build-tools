@@ -65,6 +65,20 @@ public class CommentBlock {
 		return paramTagArray;
 	}
 
+	public OptionTag[] getOptions() {
+		Vector<OptionTag> optionTags = new Vector<OptionTag>();
+
+		for (Tag tag : this.tags) {
+			if (tag.getName().equals("option"))
+				optionTags.add((OptionTag) tag);
+		}
+
+		OptionTag optionTagArray[] = new OptionTag[optionTags.size()];
+		optionTags.toArray(optionTagArray);
+
+		return optionTagArray;
+	}
+
 	public Tag[] getExamples() {
 		Vector<Tag> exampleTags = new Vector<Tag>();
 
@@ -156,6 +170,8 @@ public class CommentBlock {
 
 					if (tagName.equals("param"))
 						tag = new ParamTag(tagName, tagText, pos);
+					else if (tagName.equals("option"))
+						tag = new OptionTag(tagName, tagText, pos);
 					else if (tagName.equals("return"))
 						tag = new ReturnTag(tagName, tagText, pos);
 					else if (tagName.equals("see"))
