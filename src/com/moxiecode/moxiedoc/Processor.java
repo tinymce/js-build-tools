@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
+import java.util.Hashtable;
+import java.util.Enumeration;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,9 +36,11 @@ public class Processor {
 	private Document doc;
 	private File templateDir;
 	private String title, eventClass;
+	private Hashtable<String, String> namespaceDescriptions;
 
 	public Processor() {
 		this.files = new Vector<File>();
+		this.namespaceDescriptions = new Hashtable<String, String>();
 	}
 
 	public void addFile(File file) {
@@ -193,6 +197,24 @@ public class Processor {
 							}
 						}
 					}
+				}
+			}
+		}
+
+		// Add namespace descriptions
+		Enumeration nsEnum = namespaceDescriptions.keys();
+ 
+		while (nsEnum.hasMoreElements()) {
+			String namespace = (String) nsEnum.nextElement();
+			Element nsElm = XPathHelper.findElement("//namespace[@fullname='" + namespace + "']", this.doc);
+
+			if (nsElm != null) {
+				// Add description
+				if (nsElm.getFirstChild() != null) {
+					Element descriptionElm = doc.createElement("description");
+
+					descriptionElm.appendChild(doc.createTextNode(namespaceDescriptions.get(namespace)));
+					nsElm.insertBefore(descriptionElm, nsElm.getFirstChild());
 				}
 			}
 		}
@@ -382,37 +404,6 @@ public class Processor {
 
 		elm.setAttribute("summary", summary);
 
-		// Add options
-		for (OptionTag optionTag : block.getOptions()) {
-			Element optionElm = doc.createElement("option");
-
-			// Add name/type
-			optionElm.setAttribute("name", optionTag.getOptionName());
-
-			// Add types
-			String[] types = optionTag.getTypes();
-			if (types != null && types.length > 1) {
-				for (String type : types) {
-					Element typeElm = this.doc.createElement("type");
-
-					typeElm.setAttribute("fullname", type);
-
-					optionElm.appendChild(typeElm);
-				}
-			} else if (types != null && types.length == 1)
-				optionElm.setAttribute("type", types[0]);
-			else if (types == null)
-				optionElm.setAttribute("type", "Object");
-
-			// Add description
-			Element optionDescriptionElm = doc.createElement("description");
-			optionDescriptionElm.appendChild(doc.createTextNode(optionTag.getText()));
-			optionElm.appendChild(optionDescriptionElm);
-
-			// Append
-			elm.appendChild(optionElm);
-		}
-
 		// Add params
 		for (ParamTag paramTag : block.getParams()) {
 			Element paramElm = doc.createElement("param");
@@ -439,6 +430,37 @@ public class Processor {
 			Element paramDescriptionElm = doc.createElement("description");
 			paramDescriptionElm.appendChild(doc.createTextNode(paramTag.getText()));
 			paramElm.appendChild(paramDescriptionElm);
+
+			// Add options
+			for (OptionTag optionTag : paramTag.getOptions()) {
+				Element optionElm = doc.createElement("option");
+
+				// Add name/type
+				optionElm.setAttribute("name", optionTag.getOptionName());
+
+				// Add types
+				String[] types2 = optionTag.getTypes();
+				if (types2 != null && types2.length > 1) {
+					for (String type : types2) {
+						Element typeElm = this.doc.createElement("type");
+
+						typeElm.setAttribute("fullname", type);
+
+						optionElm.appendChild(typeElm);
+					}
+				} else if (types2 != null && types2.length == 1)
+					optionElm.setAttribute("type", types2[0]);
+				else if (types2 == null)
+					optionElm.setAttribute("type", "Object");
+
+				// Add description
+				Element optionDescriptionElm = doc.createElement("description");
+				optionDescriptionElm.appendChild(doc.createTextNode(optionTag.getText()));
+				optionElm.appendChild(optionDescriptionElm);
+
+				// Append
+				paramElm.appendChild(optionElm);
+			}
 
 			// Append
 			elm.appendChild(paramElm);
@@ -539,7 +561,9 @@ public class Processor {
 		boolean isStaticClass = false;
 
 		for (CommentBlock block : blocks)  {
-			if (block.hasTag("class")) {
+			if (block.hasTag("namespace")) {
+				this.namespaceDescriptions.put(block.getTag("namespace").getText().trim(), block.getText().trim());
+			} else if (block.hasTag("class")) {
 				classElm = addClass(block);
 				isStaticClass = block.hasTag("static");
 			} else {

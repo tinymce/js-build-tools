@@ -1,3 +1,8 @@
+/**
+ * This is a namespace jada jada.
+ *
+ * @namespace namespace
+ */
 (function() {
 	/**
 	 * Here is some class.
@@ -6,9 +11,7 @@
 	 * @example
 	 * window.SomeClass.someFunc();
 	 * window.SomeClass.someOtherFunc();
-	 * @class SomeClass
-	 * @option {String} some_setting1 some value 1.
-	 * @option {Number} some_setting2 some value 2.
+	 * @class namespace.SomeClass
 	 */
 	window.SomeClass = function() {
 		/**
@@ -16,7 +19,9 @@
 		 *
 		 * @version 1.1
 		 * @method someFunc
-		 * @param {String} arg1 First arg.
+		 * @param {Object} settings First arg.
+		 *   @option {String/Object} some_setting1 some value 1.
+		 *   @option {Number} some_setting2 some value 2.
 		 * @param {String} arg2 Second arg.
 		 * @return {String} Some string.
 		 */
@@ -43,7 +48,7 @@
 	/**
 	 * Here is some static class.
 	 *
-	 * @class SomeOtherClass
+	 * @class namespace.SomeOtherClass
 	 * @static
 	 */
 	window.SomeOtherClass = {

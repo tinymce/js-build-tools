@@ -200,6 +200,23 @@ public class CommentBlock {
 			// Ignore
 		}
 
+		// Add options to params
+		for (int i = 0; i < tags.size(); i++) {
+			if (((Tag) tags.get(i)).getName().equals("param")) {
+				ParamTag paramTag = (ParamTag) tags.get(i);
+
+				// Find options after the param tag and add them to the param
+				for (i = i + 1; i < tags.size(); i++) {
+					Tag optionTag = (Tag) tags.get(i);
+
+					if (optionTag.getName().equals("option"))
+						paramTag.addOption((OptionTag) optionTag);
+					else
+						break;
+				}
+			}
+		}
+
 		// Add tags
 		this.tags = new Tag[tags.size()];
 		tags.toArray(this.tags);
