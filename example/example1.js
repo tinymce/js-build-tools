@@ -15,6 +15,18 @@
 	 */
 	window.SomeClass = function() {
 		/**
+		 * Some callback function.
+		 *
+		 * @version 1.1
+		 * @callback someFuncCallback
+		 * @param {Object} settings First arg.
+		 *   @option {String/Object} some_setting1 some value 1.
+		 *   @option {Number} some_setting2 some value 2.
+		 * @param {String} arg2 Second arg.
+		 * @return {String} Some string.
+		 */
+
+		/**
 		 * Some function.
 		 *
 		 * @version 1.1
@@ -23,6 +35,7 @@
 		 *   @option {String/Object} some_setting1 some value 1.
 		 *   @option {Number} some_setting2 some value 2.
 		 * @param {String} arg2 Second arg.
+		 * @param {someFuncCallback} arg3 Second arg.
 		 * @return {String} Some string.
 		 */
 		this.someFunc = function(arg1, arg2) {

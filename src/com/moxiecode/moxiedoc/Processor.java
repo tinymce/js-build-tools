@@ -201,6 +201,28 @@ public class Processor {
 			}
 		}
 
+		// Add fullnames to all callbacks
+		for (Element callbackElm : XPathHelper.findElements("//callback", this.doc)) {
+			Element callbackParentClassElm = (Element) callbackElm.getParentNode().getParentNode();
+			String fullName = callbackParentClassElm.getAttribute("fullname") + "." + callbackElm.getAttribute("name");
+
+			callbackElm.setAttribute("fullname", fullName);
+
+			for (Element paramElm : XPathHelper.findElements("members/method/param|members/event/param|members/callback/param", callbackParentClassElm)) {
+				if (paramElm.hasAttribute("type")) {
+					if (paramElm.getAttribute("type").equals(callbackElm.getAttribute("name"))) {
+						paramElm.setAttribute("type", fullName);
+					}
+				} else {
+					for (Element typeElm : XPathHelper.findElements("type", paramElm)) {
+						if (typeElm.getAttribute("fullname").equals(callbackElm.getAttribute("name"))) {
+							typeElm.setAttribute("fullname", fullName);
+						}
+					}
+				}
+			}
+		}
+
 		// Add namespace descriptions
 		Enumeration nsEnum = namespaceDescriptions.keys();
  
@@ -538,6 +560,12 @@ public class Processor {
 		if (block.hasTag("event")) {
 			memberElm = doc.createElement("event");
 			memberElm.setAttribute("name", block.getTag("event").getText());
+		}
+
+		// Is callback
+		if (block.hasTag("callback")) {
+			memberElm = doc.createElement("callback");
+			memberElm.setAttribute("name", block.getTag("callback").getText());
 		}
 
 		// Is property

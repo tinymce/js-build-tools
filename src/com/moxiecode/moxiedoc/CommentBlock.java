@@ -206,13 +206,15 @@ public class CommentBlock {
 				ParamTag paramTag = (ParamTag) tags.get(i);
 
 				// Find options after the param tag and add them to the param
-				for (i = i + 1; i < tags.size(); i++) {
-					Tag optionTag = (Tag) tags.get(i);
+				for (int y = i + 1; y < tags.size(); y++) {
+					Tag optionTag = (Tag) tags.get(y);
 
 					if (optionTag.getName().equals("option"))
 						paramTag.addOption((OptionTag) optionTag);
-					else
+					else {
+						i = y - 1;
 						break;
+					}
 				}
 			}
 		}
