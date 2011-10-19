@@ -11,7 +11,7 @@ import org.apache.tools.ant.Project;
 
 public class LessTask extends Task {
 	protected String inFile, outFile, script;
-	protected boolean compress;
+	protected boolean compress, linebreaks;
 
 	public void setScript(String file) {
 		this.script = file;
@@ -19,6 +19,10 @@ public class LessTask extends Task {
 
 	public void setCompress(boolean compress) {
 		this.compress = compress;
+	}
+
+	public void setLineBreaks(boolean linebreaks) {
+		this.linebreaks = linebreaks;
 	}
 
 	public void setInFile(String in_file) {
@@ -408,7 +412,7 @@ public class LessTask extends Task {
             sb = new StringBuffer(css);
             while (i < sb.length()) {
                 char c = sb.charAt(i++);
-                if (c == '}' && i - linestartpos > linebreakpos) {
+                if (c == '}' && ((i - linestartpos > linebreakpos) || this.linebreaks)) {
                     sb.insert(i, '\n');
                     linestartpos = i;
                 }
@@ -425,6 +429,12 @@ public class LessTask extends Task {
         for(i = 0, max = preservedTokens.size(); i < max; i++) {
             css = css.replace("___YUICSSMIN_PRESERVED_TOKEN_" + i + "___", preservedTokens.get(i).toString());
         }
+
+		// Reduce urls if they are simple
+		css = css.replaceAll("url\\('([\\/.\\-a-z0-9_])+'\\)", "url($1)");
+
+		// Reduce startColorStr/endColorStr in MS filters
+		css = css.replaceAll("(startColorStr|endColorStr|opacity)=\\s*([#0-9a-f]+)\\s*", "$1=$2");
 
         // Trim the final string (for any leading or trailing white spaces)
         css = css.trim();
