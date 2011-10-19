@@ -42,7 +42,7 @@
 		<mkdir dir="${project.build.dir}/classes"/>
 
 		<!-- Compile the java code from ${src} into ${build} -->
-		<javac target="1.5" nowarn="true" srcdir="${project.src.dir}" destdir="${project.build.dir}/classes" debug="true">
+		<javac target="1.5" source="1.5" nowarn="true" srcdir="${project.src.dir}" destdir="${project.build.dir}/classes" debug="true">
 			<compilerarg value="-Xlint" />
 			<classpath refid="tasks.classpath" />
 		</javac>
