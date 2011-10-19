@@ -71,7 +71,7 @@
 		<yuicompress infile="dtds/xhtml1-transitional.dtd.children.compressed.js" outfile="dtds/xhtml1-transitional.dtd.children.compressed.min.js" />
 
 		<!-- Run less compiler and compress the output-->
-		<less script="test.js" infile="test.less" outfile="test.min.css" compress="true" />
+		<less script="../lib/less.rhino.js" infile="test.less" outfile="test.min.css" compress="true" />
 	</target>
 
 	<!-- Generate JS documentation -->
